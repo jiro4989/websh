@@ -13,3 +13,4 @@ binDir        = "bin"
 
 requires "nim >= 1.0.2"
 requires "jester >= 0.4.3"
+requires "uuids >= 0.1.10"

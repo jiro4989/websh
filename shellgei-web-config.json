@@ -1,0 +1,7 @@
+{
+  "dockerimage": "theoldmoon0602/shellgeibot:master",
+  "timeout": "20s",
+  "workdir": ".",
+  "memory": "100M",
+  "mediasize": 250
+}
