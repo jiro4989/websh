@@ -26,7 +26,7 @@ AWSインフラの設定はこのリポジトリでは管理しない。
 |=================
 | 分類 | Method | URL
 | トップページ | GET | https://jiro4989.github.io/shellgei-web/
-| シェル芸の実行 | POST | https://jiro4989.github.io/shellgei-web/api/shellgei
+| シェル芸の実行 | POST | https://<domain>/api/shellgei
 |=================
 
 == シーケンス図
