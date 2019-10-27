@@ -10,10 +10,9 @@ router myrouter:
   post "/shellgei":
     let respJson = request.body().parseJson().to(RespShellgeiJSON)
     echo respJson
-    let tmpDir = "." / "tmp"
     let uuid = $genUUID()
-    let scriptName = uuid / ".sh"
-    let shellScriptPath = tmpDir / scriptName
+    let scriptName = &"{uuid}.sh"
+    let shellScriptPath = getTempDir() / scriptName
     writeFile(shellScriptPath, respJson.code)
     defer: removeFile(shellScriptPath)
 
@@ -31,9 +30,10 @@ router myrouter:
       # "-v", "./images:/images",
       # "-v", "./media:/media:ro",
       "theoldmoon0602/shellgeibot:master",
-      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+      "bash", "-c", &"ls",
+      #"bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
-    let outp = execProcess("docker", args = args)
+    let outp = execProcess("docker", args = args, options = {poUsePath})
     resp %*{"result":outp}
 
 proc main =
