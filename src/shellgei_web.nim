@@ -1,9 +1,15 @@
-import jester,
-  asyncdispatch, os, strutils
+import jester
+import asyncdispatch, os, strutils, json
+
+type
+  RespShellgeiJSON* = object
+    code*: string
 
 router myrouter:
-  get "/":
-    resp "hello"
+  post "/shellgei":
+    let formData = request.body().parseJson().to(RespShellgeiJSON)
+    echo formData
+    resp %*{"result": "test"}
 
 proc main =
   var port = getEnv("API_PORT", "8080").parseInt().Port
