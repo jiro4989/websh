@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  shellgei:
+    image: theoldmoon0602/shellgeibot
+    volumes:
+      - "./images:/images"
+    expose:
+      - 8888
+
