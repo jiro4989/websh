@@ -48,3 +48,10 @@ Nimのjesterというモジュールを使ってAPIサーバのバイナリを�
 生成したバイナリだけをコンテナに含める。
 
 コレも可能ならCI環境でビルドしてDockerHubにpushしたい。
+
+== 動作確認
+
+[source,bash]
+----
+curl -X POST -H "Content-Type: application/json" -d '{"code":"ls -lah"}'  http://localhost:8080/shellgei 
+----
