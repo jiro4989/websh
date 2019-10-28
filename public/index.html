@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>シェル芸bot Web</title>
+    <script>
+        const url = "https://localhost:8080/shellgei"
+        async function sendCodeButtonOnClicked() {
+            console.log('send')
+            const code = document.getElementById('codeInput').value;
+            const data = {
+                code: code
+            }
+            const resp = await fetch(url, {
+                method: "POST",
+                cache: "no-cache",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                },
+                body: JSON.stringify(data),
+            })
+            const result = await resp.json()
+            document.getElementById('resultStdout').value = result;
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <h1>シェル芸bot Web</h1>
+        <hr>
+    </header>
+    <div class="main-container">
+        <div class="left-container">
+            <h2>Input</h2>
+            <textarea name="" id="codeInput" cols="30" rows="10"></textarea>
+            <input type="button" value="Send" onclick="sendCodeButtonOnClicked()">
+        </div>
+        <div class="right-container">
+            <h2>Output</h2>
+            <div>
+                <h3>Stdout</h3>
+                <textarea name="" id="resultStdout" cols="30" rows="10"></textarea>
+            </div>
+            <div>
+                <h3>Stderr</h3>
+                <textarea name="" id="resultStderr" cols="30" rows="10"></textarea>
+            </div>
+            <div>
+                <h3>Images</h3>
+                TODO
+            </div>
+        </div>
+    </div>
+    <footer>
+        <hr>
+    </footer>
+</body>
+
+</html>
