@@ -17,7 +17,9 @@ router myrouter:
     let scriptName = &"{uuid}.sh"
     let shellScriptPath = getTempDir() / scriptName
     writeFile(shellScriptPath, respJson.code)
-    defer: removeFile(shellScriptPath)
+    defer:
+      removeFile(shellScriptPath)
+      echo &"{shellScriptPath} was removed"
 
     let containerShellScriptPath = &"/tmp/{scriptName}"
     let name = "unko"
