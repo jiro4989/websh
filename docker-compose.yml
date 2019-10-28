@@ -5,12 +5,12 @@ services:
     image: nginx:1.17
     volumes:
       - "./proxy/conf.d:/etc/nginx/conf.d:ro"
-    depends_on:
-      - api
+    # depends_on:
+    #   - api
     ports:
       - "80:80"
 
-  api:
-    build: dockerfiles/api
-    expose:
-      - 8080
+  # api:
+  #   build: dockerfiles/api
+  #   expose:
+  #     - 8080
