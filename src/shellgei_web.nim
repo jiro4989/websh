@@ -1,5 +1,5 @@
 import jester, uuids
-import asyncdispatch, os, osproc, strutils, json
+import asyncdispatch, os, osproc, strutils, json, random
 from strformat import `&`
 
 type
@@ -8,6 +8,9 @@ type
 
 router myrouter:
   post "/shellgei":
+    # TODO:
+    # uuidを使ってるけれど、どうせならシェル芸botと同じアルゴリズムでファ
+    # イルを生成したい
     let respJson = request.body().parseJson().to(RespShellgeiJSON)
     echo respJson
     let uuid = $genUUID()
@@ -29,9 +32,9 @@ router myrouter:
       "-v", &"{shellScriptPath}:{containerShellScriptPath}",
       # "-v", "./images:/images",
       # "-v", "./media:/media:ro",
-      "theoldmoon0602/shellgeibot:master",
-      "bash", "-c", &"ls",
-      #"bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+      "theoldmoon0602/shellgeibot",
+      #"theoldmoon0602/shellgeibot:master",
+      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let outp = execProcess("docker", args = args, options = {poUsePath})
     resp %*{"result":outp}
