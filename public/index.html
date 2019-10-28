@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>シェル芸bot Web</title>
     <script>
-        const url = "https://localhost:8080/shellgei"
+        const url = "http://localhost:8080/shellgei"
         async function sendCodeButtonOnClicked() {
             console.log('send')
             const code = document.getElementById('codeInput').value;
@@ -16,13 +16,15 @@
             }
             const resp = await fetch(url, {
                 method: "POST",
+                mode: "no-cors",
                 cache: "no-cache",
                 headers: {
                     "Content-Type": "application/json; charset=utf-8",
                 },
                 body: JSON.stringify(data),
-            })
-            const result = await resp.json()
+            });
+            const result = await resp.json();
+            console.log(result);
             document.getElementById('resultStdout').value = result;
         }
     </script>
