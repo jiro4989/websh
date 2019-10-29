@@ -5,10 +5,11 @@ services:
     image: nginx:1.17
     volumes:
       - "./proxy/conf.d:/etc/nginx/conf.d:ro"
-    # depends_on:
-    #   - api
     ports:
       - "80:80"
+    network_mode: "host"
+    # depends_on:
+    #   - api
 
   # api:
   #   build: dockerfiles/api
