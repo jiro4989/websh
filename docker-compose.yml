@@ -8,10 +8,3 @@ services:
     ports:
       - "80:80"
     network_mode: "host"
-    # depends_on:
-    #   - api
-
-  # api:
-  #   build: dockerfiles/api
-  #   expose:
-  #     - 8080
