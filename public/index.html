@@ -9,7 +9,6 @@
     <script>
         const url = "http://localhost/api/shellgei"
         async function sendCodeButtonOnClicked() {
-            console.log('send')
             const code = document.getElementById('codeInput').value;
             const data = {
                 code: code
@@ -21,7 +20,6 @@
                 body: JSON.stringify(data),
             });
             const result = await resp.json();
-            console.log(result);
             document.getElementById('resultStdout').value = result.result;
         }
     </script>
