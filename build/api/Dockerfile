@@ -5,8 +5,10 @@ RUN apt-get update -yqq \
        ca-certificates \
        curl \
        build-essential \
+       git \
        ;
 
-ENV PATH $HOME/.nimble/bin:$PATH
+ENV PATH /root/.nimble/bin:$PATH
 RUN curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
-RUN sh init.sh -y
+RUN sh init.sh -y \
+    && choosenim update stable

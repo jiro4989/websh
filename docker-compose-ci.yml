@@ -1,7 +1,22 @@
 version: '3.7'
 
 services:
-  app:
+  base:
     build:
       context: .
       dockerfile: ./build/api/Dockerfile
+    image: base
+
+  build:
+    image: base
+    volumes:
+      - ".:/work"
+      - "./out:/work/bin"
+    working_dir: /work
+    entrypoint:
+      - nimble
+      - build
+      - -d:release
+      - -Y
+    depends_on:
+      - base

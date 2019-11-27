@@ -1,0 +1,77 @@
+name: build
+
+on: [push]
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Cache ubuntu image
+      id: cache-ubuntu-image
+      uses: actions/cache@v1
+      with:
+        path: ~/docker-cache
+        key: ${{ runner.os }}-docker-ubuntu-${{ hashFiles('**/Dockerfile') }}
+    - name: Load docker image
+      if: steps.cache-ubuntu-image.outputs.cache-hit == 'true'
+      run: |
+        gunzip ~/docker-cache/ubuntu.gz
+        docker load -i ~/docker-cache/ubuntu
+    - name: Build docker base image
+      run: docker-compose -f docker-compose-ci.yml build base
+    - name: Save docker ubuntu image to cache directory
+      run: |
+        mkdir -p ~/docker-cache
+        docker save ubuntu:18.04 | gzip -c > ~/docker-cache/ubuntu.gz
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build-image
+    steps:
+    - uses: actions/checkout@v1
+    - name: Cache ubuntu image
+      id: cache-ubuntu-image
+      uses: actions/cache@v1
+      with:
+        path: ~/docker-cache
+        key: ${{ runner.os }}-docker-ubuntu-${{ hashFiles('**/Dockerfile') }}
+    - name: Load docker image
+      if: steps.cache-ubuntu-image.outputs.cache-hit == 'true'
+      run: |
+        gunzip ~/docker-cache/ubuntu.gz
+        docker load -i ~/docker-cache/ubuntu
+    - name: Build shellgei-web command
+      run: |
+        mkdir -p out
+        docker-compose -f docker-compose-ci.yml run --rm build
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: bin/shellgei_web
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    env:
+      NIM_VERSION: 1.0.2
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Cache choosenim
+      id: cache-choosenim
+      uses: actions/cache@v1
+      with:
+        path: ~/.choosenim
+        key: ${{ runner.os }}-choosenim-${{ env.NIM_VERSION }}
+    - name: Cache nimble
+      id: cache-nimble
+      uses: actions/cache@v1
+      with:
+        path: ~/.nimble
+        key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
+    - uses: jiro4989/setup-nim-action@v1.0.1
+    - name: Build
+      run: nimble build -Y
+
