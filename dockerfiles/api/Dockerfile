@@ -1,1 +1,0 @@
-FROM nimlang/nim
