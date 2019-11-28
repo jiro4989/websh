@@ -1,6 +1,9 @@
-import jester, uuids
-import asyncdispatch, os, osproc, strutils, json, random
+import asyncdispatch, os, osproc, strutils, json, random, logging
 from strformat import `&`
+
+import jester, uuids
+
+addHandler(newConsoleLogger(lvlInfo, fmtStr = verboseFmtStr, useStderr = true))
 
 type
   RespShellgeiJSON* = object
@@ -45,11 +48,13 @@ router myrouter:
     let env = @"env"
     case env
     of "prd":
-      discard
+      if 0 != execShellCmd("deploy"):
+        error "デプロイに失敗: Command = deploy"
     of "stg":
-      discard
+      if 0 != execShellCmd("deploy"):
+        error "デプロイに失敗: Command = deploy"
     else:
-      discard
+      error &"不正なenv: env = {env}"
 
 proc main =
   var port = getEnv("API_PORT", "8080").parseInt().Port
