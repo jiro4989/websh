@@ -11,7 +11,7 @@ services:
     image: base
     volumes:
       - ".:/work"
-      - "./out:/work/bin"
+      - "./bin:/work/bin"
     working_dir: /work
     entrypoint:
       - nimble
