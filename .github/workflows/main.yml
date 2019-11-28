@@ -18,32 +18,11 @@ jobs:
       run: |
         gunzip ~/docker-cache/ubuntu.gz
         docker load -i ~/docker-cache/ubuntu
-    - name: Build docker base image
-      run: docker-compose -f docker-compose-ci.yml build base
-    - name: Save docker ubuntu image to cache directory
-      run: |
-        mkdir -p ~/docker-cache
-        docker save ubuntu:18.04 | gzip -c > ~/docker-cache/ubuntu.gz
-
-  release:
-    runs-on: ubuntu-latest
-    needs: build-image
-    steps:
-    - uses: actions/checkout@v1
-    - name: Cache ubuntu image
-      id: cache-ubuntu-image
-      uses: actions/cache@v1
-      with:
-        path: ~/docker-cache
-        key: ${{ runner.os }}-docker-ubuntu-${{ hashFiles('**/Dockerfile') }}
-    - name: Load docker image
-      if: steps.cache-ubuntu-image.outputs.cache-hit == 'true'
-      run: |
-        gunzip ~/docker-cache/ubuntu.gz
-        docker load -i ~/docker-cache/ubuntu
+    - name: Build docker image
+      run: docker-compose -f docker-compose-ci.yml build
     - name: Build shellgei-web command
       run: |
-        mkdir -p out
+        mkdir -p bin
         docker-compose -f docker-compose-ci.yml run --rm build
     - name: Release
       uses: softprops/action-gh-release@v1
@@ -52,6 +31,10 @@ jobs:
         files: bin/shellgei_web
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Save docker ubuntu image to cache directory
+      run: |
+        mkdir -p ~/docker-cache
+        docker save ubuntu:18.04 | gzip -c > ~/docker-cache/ubuntu.gz
 
   build:
     env:
