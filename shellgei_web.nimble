@@ -5,7 +5,7 @@ author        = "jiro4989"
 description   = "A new awesome nimble package"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["shellgei_web", "deploy"]
+bin           = @["shellgei_web"]
 binDir        = "bin"
 
 
