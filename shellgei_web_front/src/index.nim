@@ -22,29 +22,12 @@ proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
   outputStdoutValue = resp.result
 
-proc createDomTest(): VNode =
-  result = buildHtml(tdiv):
-    textarea:
-      proc onkeyup(ev: Event, n: VNode) =
-        echo $n.value
-        inputShellValue = $n.value
-    button:
-      text "実行"
-      proc onclick(ev: Event, n: VNode) =
-        let body = %*{"code": inputShellValue}
-        ajaxPost(apiUrl,
-          headers = @[
-            (cstring"mode", cstring"cors"),
-            (cstring"cache", cstring"no-cache"),
-            ],
-          data = body.toJson,
-          cont = respCb)
-    text inputShellValue
-    text outputStdoutValue
-
 proc createDom(): VNode =
   result = buildHtml(tdiv):
     tdiv(class = &"row {textColor}"):
+      nav:
+        tdiv(class = &"nav-wrapper {baseColor}"):
+          a(class = "brand-logo"): text "シェル芸Web"
       tdiv(class = "col s6"):
         h3: text "Input"
         tdiv(class = "input-field col s12"):

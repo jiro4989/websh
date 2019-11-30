@@ -44,18 +44,6 @@ router myrouter:
     let outp = execProcess("docker", args = args, options = {poUsePath})
     resp %*{"result":outp}
 
-  get "/webhook/deploy/@env":
-    let env = @"env"
-    case env
-    of "prd":
-      if 0 != execShellCmd("deploy"):
-        error "デプロイに失敗: Command = deploy"
-    of "stg":
-      if 0 != execShellCmd("deploy"):
-        error "デプロイに失敗: Command = deploy"
-    else:
-      error &"不正なenv: env = {env}"
-
 proc main =
   var port = getEnv("API_PORT", "8080").parseInt().Port
   var settings = newSettings(port = port)
