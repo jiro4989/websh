@@ -14,35 +14,49 @@ const
   apiUrl = "http://localhost/api/shellgei"
 
 var
-  inputShell: string
-  outputStdout: cstring
-  outputStderr: cstring
+  inputShellValue: string
+  outputStdoutValue: cstring
+  outputStderrValue: cstring
 
-proc onChangeInputShell(ev: Event; n: VNode) =
-  inputShell = $n.value
+proc respCb(httpStatus: int, response: cstring) =
+  let resp = fromJson[ResponseResult](response)
+  outputStdoutValue = resp.result
+
+proc createDomTest(): VNode =
+  result = buildHtml(tdiv):
+    textarea:
+      proc onkeyup(ev: Event, n: VNode) =
+        echo $n.value
+        inputShellValue = $n.value
+    button:
+      text "実行"
+      proc onclick(ev: Event, n: VNode) =
+        let body = %*{"code": inputShellValue}
+        ajaxPost(apiUrl,
+          headers = @[
+            (cstring"mode", cstring"cors"),
+            (cstring"cache", cstring"no-cache"),
+            ],
+          data = body.toJson,
+          cont = respCb)
+    text inputShellValue
+    text outputStdoutValue
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
-    nav:
-      tdiv(class = &"nav-wrapper {baseColor}"):
-        a(class = "brand-logo"): text "シェル芸Web"
     tdiv(class = &"row {textColor}"):
       tdiv(class = "col s6"):
         h2: text "Input"
         tdiv(class = "input-field col s12"):
-          textarea(id = "inputShell", class = "materialize-textarea", onchange = onChangeInputShell)
+          textarea(id = "inputShell", class = "materialize-textarea"):
+            proc onkeyup(ev: Event, n: VNode) =
+              inputShellValue = $n.value
           label(`for` = "inputShell"):
             text "ex: echo 'Hello shell'"
         button(class = "waves-effect waves-light btn"):
           text "実行"
           proc onclick(ev: Event, n: VNode) =
-            proc respCb(httpStatus: int, response: cstring) =
-              let resp = fromJson[ResponseResult](response)
-              outputStdout = cstring"unko"
-              #outputStdout = resp.result
-              echo resp
-              #redraw()
-            let body = %*{"code": inputShell}
+            let body = %*{"code": inputShellValue}
             ajaxPost(apiUrl,
               headers = @[
                 (cstring"mode", cstring"cors"),
@@ -55,13 +69,15 @@ proc createDom(): VNode =
         tdiv:
           h3: text "Stdout"
           tdiv(class = "input-field col s12"):
-            textarea(id = "outputStdout", class = "materialize-textarea", value = outputStdout)
+            textarea(id = "outputStdout", class = "materialize-textarea"):
+              text outputStdoutValue
             label(`for` = "outputStdout"):
               text "ex: echo 'Hello shell'"
         tdiv:
           h3: text "Stderr"
           tdiv(class = "input-field col s12"):
-            textarea(id = "outputStderr", class = "materialize-textarea", value = outputStderr)
+            textarea(id = "outputStderr", class = "materialize-textarea"):
+              text outputStderrValue
             label(`for` = "outputStderr"):
               text "ex: echo 'Hello shell'"
         tdiv:
