@@ -2,9 +2,7 @@ version: '3.7'
 
 services:
   base:
-    build:
-      context: .
-      dockerfile: ./build/ci/Dockerfile
+    build: .
     image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
 
   build:
