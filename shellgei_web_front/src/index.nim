@@ -38,8 +38,8 @@ proc createDom(): VNode =
               inputShell = $n.value
           label(`for` = "inputShell"):
             text "ex: echo 'Hello shell'"
-        button(class = "waves-effect waves-light btn"):
-          text "実行"
+        button:
+          text "Run"
           proc onclick(ev: Event, n: VNode) =
             let body = %*{"code": inputShell}
             ajaxPost(apiUrl,
