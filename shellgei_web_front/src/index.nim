@@ -10,15 +10,15 @@ type
     images: seq[cstring]
 
 const
-  baseColor = "blue-grey darken-1"
-  cardColor = "blue-grey darken-2"
-  textColor = "blue-grey-text darken-3"
+  baseColor = "grey darken-4"
+  textColor = "green-text darken-3"
+  textInputColor = "grey-text lighten-5"
   apiUrl = "http://localhost/api/shellgei"
 
 var
-  inputShell: string
-  outputStdout: cstring
-  outputStderr: cstring
+  inputShell = cstring""
+  outputStdout = cstring""
+  outputStderr = cstring""
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
@@ -26,14 +26,14 @@ proc respCb(httpStatus: int, response: cstring) =
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
-    tdiv(class = &"row {textColor}"):
+    tdiv(class = &"row {baseColor} {textColor}"):
       nav:
         tdiv(class = &"nav-wrapper {baseColor}"):
-          a(class = "brand-logo"): text "シェル芸Web"
+          a(class = &"brand-logo {textColor}"): text "シェル芸Web"
       tdiv(class = "col s6"):
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
-          textarea(id = "inputShell", class = "materialize-textarea"):
+          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
             proc onkeyup(ev: Event, n: VNode) =
               inputShell = $n.value
           label(`for` = "inputShell"):
@@ -54,17 +54,13 @@ proc createDom(): VNode =
         tdiv:
           h4: text "Stdout"
           tdiv(class = "input-field col s12"):
-            textarea(id = "outputStdout", class = "materialize-textarea", style = style(StyleAttr.minHeight, cstring"400px")):
+            textarea(id = "outputStdout", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"400px")):
               text outputStdout
-            label(`for` = "outputStdout"):
-              text "ex: echo 'Hello shell'"
         # tdiv:
         #   h4: text "Stderr"
         #   tdiv(class = "input-field col s12"):
         #     textarea(id = "outputStderr", class = "materialize-textarea"):
         #       text outputStderr
-        #     label(`for` = "outputStderr"):
-        #       text "ex: echo 'Hello shell'"
         tdiv:
           h4: text "Images"
     footer(class = &"page-footer {baseColor}"):
