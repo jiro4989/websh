@@ -66,7 +66,7 @@ router myrouter:
     resp %*{"stdout":outp, "stderr":"", "images":images}
 
 proc main =
-  var port = getEnv("API_PORT", "8080").parseInt().Port
+  var port = getEnv("SHELLGEI_WEB_PORT", "5000").parseInt().Port
   var settings = newSettings(port = port)
   var jester = initJester(myrouter, settings = settings)
   jester.serve()
