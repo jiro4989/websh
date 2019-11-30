@@ -1,4 +1,4 @@
-import asyncdispatch, os, osproc, strutils, json, random, logging
+import asyncdispatch, os, osproc, strutils, json, random, logging, base64
 from strformat import `&`
 
 import jester, uuids
@@ -49,7 +49,20 @@ router myrouter:
       ]
     let outp = execProcess("docker", args = args, options = {poUsePath})
     info outp
+
+    # 画像ファイルをbase64に変換
     var images: seq[string]
+    for kind, path in walkDir(imageDir):
+      if kind != pcFile:
+        continue
+      let (dir, name, ext) = splitFile(path)
+      if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
+        continue
+      # JavaScriptのimg.srcにセットする時のプレフィックス
+      let meta = "data:image/png;base64,"
+      let data = meta & base64.encode(readFile(path))
+      images.add(data)
+
     resp %*{"stdout":outp, "stderr":"", "images":images}
 
 proc main =
