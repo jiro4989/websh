@@ -1,10 +1,11 @@
-version: '3'
+version: '3.7'
 
 services:
   proxy:
     image: nginx:1.17
     volumes:
       - "./proxy/conf.d:/etc/nginx/conf.d:ro"
+      - "./shellgei_web_front/public:/var/www:ro"
     ports:
       - "80:80"
     network_mode: "host"
