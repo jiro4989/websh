@@ -9,6 +9,9 @@ type
   RespShellgeiJSON* = object
     code*: string
 
+let
+  cwd = getCurrentDir()
+
 router myrouter:
   post "/shellgei":
     # TODO:
@@ -24,6 +27,7 @@ router myrouter:
       removeFile(shellScriptPath)
       echo &"{shellScriptPath} was removed"
 
+    createDir "images"
     let containerShellScriptPath = &"/tmp/{scriptName}"
     let name = "unko"
     let args = [
@@ -35,14 +39,17 @@ router myrouter:
       "--pids-limit", "1024",
       "--name", uuid,
       "-v", &"{shellScriptPath}:{containerShellScriptPath}",
-      # "-v", "./images:/images",
+      "-v", &"{cwd}/images:/images",
       # "-v", "./media:/media:ro",
       "theoldmoon0602/shellgeibot",
       #"theoldmoon0602/shellgeibot:master",
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let outp = execProcess("docker", args = args, options = {poUsePath})
-    resp %*{"result":outp}
+    echo outp
+    removeDir "images"
+    var images: seq[string]
+    resp %*{"stdout":outp, "stderr":"", "images":images}
 
 proc main =
   var port = getEnv("API_PORT", "8080").parseInt().Port

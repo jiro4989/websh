@@ -5,7 +5,9 @@ import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, j
 
 type
   ResponseResult = object
-    result: cstring
+    stdout: cstring
+    stderr: cstring
+    images: seq[cstring]
 
 const
   baseColor = "blue-grey darken-1"
@@ -14,13 +16,14 @@ const
   apiUrl = "http://localhost/api/shellgei"
 
 var
-  inputShellValue: string
-  outputStdoutValue: cstring
-  outputStderrValue: cstring
+  inputShell: string
+  outputStdout: cstring
+  outputStderr: cstring
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
-  outputStdoutValue = resp.result
+  echo resp
+  outputStdout = resp.stdout
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
@@ -30,16 +33,16 @@ proc createDom(): VNode =
           a(class = "brand-logo"): text "シェル芸Web"
       tdiv(class = "col s6"):
         h3: text "Input"
-        tdiv(class = "input-field col s12"):
+        tdiv(class = "input-field col s12 m6"):
           textarea(id = "inputShell", class = "materialize-textarea"):
             proc onkeyup(ev: Event, n: VNode) =
-              inputShellValue = $n.value
+              inputShell = $n.value
           label(`for` = "inputShell"):
             text "ex: echo 'Hello shell'"
         button(class = "waves-effect waves-light btn"):
           text "実行"
           proc onclick(ev: Event, n: VNode) =
-            let body = %*{"code": inputShellValue}
+            let body = %*{"code": inputShell}
             ajaxPost(apiUrl,
               headers = @[
                 (cstring"mode", cstring"cors"),
@@ -52,15 +55,15 @@ proc createDom(): VNode =
         tdiv:
           h4: text "Stdout"
           tdiv(class = "input-field col s12"):
-            textarea(id = "outputStdout", class = "materialize-textarea"):
-              text outputStdoutValue
+            textarea(id = "outputStdout", class = "materialize-textarea", style = style(StyleAttr.minHeight, cstring"400px")):
+              text outputStdout
             label(`for` = "outputStdout"):
               text "ex: echo 'Hello shell'"
         # tdiv:
         #   h4: text "Stderr"
         #   tdiv(class = "input-field col s12"):
         #     textarea(id = "outputStderr", class = "materialize-textarea"):
-        #       text outputStderrValue
+        #       text outputStderr
         #     label(`for` = "outputStderr"):
         #       text "ex: echo 'Hello shell'"
         tdiv:
