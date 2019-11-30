@@ -22,7 +22,6 @@ var
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
-  echo resp
   outputStdout = resp.stdout
 
 proc createDom(): VNode =
