@@ -9,25 +9,27 @@ type
   RespShellgeiJSON* = object
     code*: string
 
-let
-  cwd = getCurrentDir()
-
 router myrouter:
   post "/shellgei":
     # TODO:
     # uuidを使ってるけれど、どうせならシェル芸botと同じアルゴリズムでファ
     # イルを生成したい
     let respJson = request.body().parseJson().to(RespShellgeiJSON)
-    echo respJson
+    info respJson
     let uuid = $genUUID()
     let scriptName = &"{uuid}.sh"
     let shellScriptPath = getTempDir() / scriptName
     writeFile(shellScriptPath, respJson.code)
+
+    let img = "images"
+    let imageDir = getCurrentDir() / img / uuid
     defer:
       removeFile(shellScriptPath)
-      echo &"{shellScriptPath} was removed"
+      info &"{shellScriptPath} was removed"
+      removeDir(imageDir)
+      info &"{imageDir} was removed"
 
-    createDir "images"
+    createDir(imageDir)
     let containerShellScriptPath = &"/tmp/{scriptName}"
     let name = "unko"
     let args = [
@@ -39,15 +41,14 @@ router myrouter:
       "--pids-limit", "1024",
       "--name", uuid,
       "-v", &"{shellScriptPath}:{containerShellScriptPath}",
-      "-v", &"{cwd}/images:/images",
+      "-v", &"{imageDir}:/{img}",
       # "-v", "./media:/media:ro",
       "theoldmoon0602/shellgeibot",
       #"theoldmoon0602/shellgeibot:master",
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let outp = execProcess("docker", args = args, options = {poUsePath})
-    echo outp
-    removeDir "images"
+    info outp
     var images: seq[string]
     resp %*{"stdout":outp, "stderr":"", "images":images}
 
