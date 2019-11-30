@@ -56,13 +56,13 @@ proc createDom(): VNode =
               text outputStdoutValue
             label(`for` = "outputStdout"):
               text "ex: echo 'Hello shell'"
-        tdiv:
-          h4: text "Stderr"
-          tdiv(class = "input-field col s12"):
-            textarea(id = "outputStderr", class = "materialize-textarea"):
-              text outputStderrValue
-            label(`for` = "outputStderr"):
-              text "ex: echo 'Hello shell'"
+        # tdiv:
+        #   h4: text "Stderr"
+        #   tdiv(class = "input-field col s12"):
+        #     textarea(id = "outputStderr", class = "materialize-textarea"):
+        #       text outputStderrValue
+        #     label(`for` = "outputStderr"):
+        #       text "ex: echo 'Hello shell'"
         tdiv:
           h4: text "Images"
     footer(class = &"page-footer {baseColor}"):
