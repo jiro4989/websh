@@ -5,16 +5,27 @@ services:
     build: .
     image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
 
-  build:
+  build_server:
     image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
     volumes:
-      - ".:/work"
-      - "./bin:/work/bin"
+      - "./shellgei_web_server:/work"
     working_dir: /work
     entrypoint:
       - nimble
       - build
       - -d:release
+      - -Y
+    depends_on:
+      - base
+
+  build_front:
+    image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
+    volumes:
+      - "./shellgei_web_front:/work"
+    working_dir: /work
+    entrypoint:
+      - nimble
+      - build
       - -Y
     depends_on:
       - base
