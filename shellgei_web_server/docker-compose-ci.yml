@@ -4,7 +4,7 @@ services:
   base:
     build:
       context: .
-      dockerfile: ./build/api/Dockerfile
+      dockerfile: ./build/ci/Dockerfile
     image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
 
   build:
