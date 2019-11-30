@@ -19,10 +19,12 @@ var
   inputShell = cstring""
   outputStdout = cstring""
   outputStderr = cstring""
+  outputImages: seq[cstring]
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
   outputStdout = resp.stdout
+  outputImages = resp.images
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
@@ -63,6 +65,9 @@ proc createDom(): VNode =
         #       text outputStderr
         tdiv:
           h4: text "Images"
+          for img in outputImages:
+            tdiv:
+              img(src = img)
     footer(class = &"page-footer {baseColor}"):
       tdiv(class = "footer-copyright"):
         tdiv(class = "container"):
