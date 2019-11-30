@@ -46,7 +46,7 @@ proc createDom(): VNode =
   result = buildHtml(tdiv):
     tdiv(class = &"row {textColor}"):
       tdiv(class = "col s6"):
-        h2: text "Input"
+        h3: text "Input"
         tdiv(class = "input-field col s12"):
           textarea(id = "inputShell", class = "materialize-textarea"):
             proc onkeyup(ev: Event, n: VNode) =
@@ -65,23 +65,23 @@ proc createDom(): VNode =
               data = body.toJson,
               cont = respCb)
       tdiv(class = "col s6"):
-        h2: text "Output"
+        h3: text "Output"
         tdiv:
-          h3: text "Stdout"
+          h4: text "Stdout"
           tdiv(class = "input-field col s12"):
             textarea(id = "outputStdout", class = "materialize-textarea"):
               text outputStdoutValue
             label(`for` = "outputStdout"):
               text "ex: echo 'Hello shell'"
         tdiv:
-          h3: text "Stderr"
+          h4: text "Stderr"
           tdiv(class = "input-field col s12"):
             textarea(id = "outputStderr", class = "materialize-textarea"):
               text outputStderrValue
             label(`for` = "outputStderr"):
               text "ex: echo 'Hello shell'"
         tdiv:
-          h3: text "Images"
+          h4: text "Images"
     footer(class = &"page-footer {baseColor}"):
       tdiv(class = "footer-copyright"):
         tdiv(class = "container"):
