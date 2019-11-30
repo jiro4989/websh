@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  base:
+    build:
+      context: .
+      dockerfile: ./build/api/Dockerfile
+    image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
+
+  build:
+    image: github.com/jiro4989/shellgei_web/shellgei_web_server/base
+    volumes:
+      - ".:/work"
+      - "./bin:/work/bin"
+    working_dir: /work
+    entrypoint:
+      - nimble
+      - build
+      - -d:release
+      - -Y
+    depends_on:
+      - base
