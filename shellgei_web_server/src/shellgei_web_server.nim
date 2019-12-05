@@ -3,8 +3,6 @@ from strformat import `&`
 
 import jester, uuids
 
-addHandler(newConsoleLogger(lvlInfo, fmtStr = verboseFmtStr, useStderr = true))
-
 type
   RespShellgeiJSON* = object
     code*: string
