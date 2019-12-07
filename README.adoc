@@ -4,3 +4,25 @@
 
 シェル芸botのDockerイメージを利用したWeb移植。
 
+== 背景
+
+https://github.com/theoremoon/ShellgeiBot[シェル芸bot]のWeb移植の
+https://github.com/kekeho/SGWeb[SGWeb]というWebアプリがある。
+
+最新のシェル芸botに追従してなかったので、試しに自分が最新のシェル芸botに追従する
+Webアプリ作って公開してみよう、という試みから。
+あとWebアプリを作る勉強もかねて。
+
+== 実装
+
+* フロントエンド
+** Nim (karax)
+* バックエンド
+** Nim (jester)
+** Docker
+
+== 多謝
+
+* https://github.com/theoremoon/ShellgeiBot[シェル芸bot]
+* https://github.com/theoremoon/ShellgeiBot-Image[シェル芸botのDockerイメージ]
+* https://github.com/kekeho/SGWeb[SGWeb]
