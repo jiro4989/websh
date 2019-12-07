@@ -53,7 +53,6 @@ router myrouter:
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 20 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let outp = execProcess("docker", args = args, options = {poUsePath})
-    info outp
 
     # 画像ファイルをbase64に変換
     var images: seq[string]
