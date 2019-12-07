@@ -1,12 +1,8 @@
 version: '3.7'
 
 services:
-  base:
-    build: .
-    image: github.com/jiro4989/websh/websh_server/base
-
   build_server:
-    image: github.com/jiro4989/websh/websh_server/base
+    image: jiro4989/websh:latest
     volumes:
       - "./websh_server:/work"
     working_dir: /work
@@ -15,11 +11,9 @@ services:
       - build
       - -d:release
       - -Y
-    depends_on:
-      - base
 
   build_front:
-    image: github.com/jiro4989/websh/websh_server/base
+    image: jiro4989/websh:latest
     volumes:
       - "./websh_front:/work"
     working_dir: /work
@@ -27,5 +21,3 @@ services:
       - nimble
       - build
       - -Y
-    depends_on:
-      - base
