@@ -54,3 +54,4 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       env:
         WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        data: "Hello from github actions!"
