@@ -13,7 +13,13 @@ const
   baseColor = "grey darken-4"
   textColor = "green-text darken-3"
   textInputColor = "grey-text lighten-5"
-  apiUrl = "https://websh.jiro4989.com/api/shellgei"
+
+when defined local:
+  # ローカル開発用
+  const apiUrl = "http://localhost/api/shellgei"
+else:
+  # 本番用
+  const apiUrl = "https://websh.jiro4989.com/api/shellgei"
 
 var
   inputShell = cstring""
