@@ -23,6 +23,10 @@ Webアプリ作って公開してみるか、と思ったから。
 ** Nim (jester)
 ** Docker
 
+== インフラ
+
+https://github.com/jiro4989/infra[infra]リポジトリで管理。
+
 == API
 
 実体はフロントエンドのHTMLからAPIリクエストして実行結果を受け取ってるだけです。

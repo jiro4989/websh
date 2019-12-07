@@ -22,8 +22,13 @@ router myrouter:
     # TODO:
     # uuidを使ってるけれど、どうせならシェル芸botと同じアルゴリズムでファ
     # イルを生成したい
-    let respJson = request.body().parseJson().to(RespShellgeiJSON)
+    var respJson = request.body().parseJson().to(RespShellgeiJSON)
     info respJson
+    # シェバンを付けないとshとして評価されるため一部の機能がつかえない模様(プロ
+    # セス置換とか) (#7)
+    if not respJson.code.startsWith("#!"):
+      # シェバンがついてないときだけデフォルトbash
+      respJson.code = "#!/bin/bash\n" & respJson.code
     let uuid = $genUUID()
     let scriptName = &"{uuid}.sh"
     let shellScriptPath = getTempDir() / scriptName
