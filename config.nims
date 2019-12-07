@@ -12,7 +12,7 @@ task run, "コンテナ停止してビルドして全部起動しなおす":
   selfExec "up"
   selfExec "runServer"
 
-task buildFront, "websh_frontのJSをビルドする":
+task buildFront, "websh_frontのJSをローカル用にビルドする":
   withDir frontDir:
     exec "nimble build -Y -d:local"
 
