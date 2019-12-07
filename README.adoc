@@ -4,6 +4,8 @@
 
 シェル芸botのDockerイメージを利用したWeb移植。
 
+image:./docs/top.png[]
+
 == 背景
 
 https://github.com/theoremoon/ShellgeiBot[シェル芸bot]のWeb移植の
