@@ -20,24 +20,24 @@ jobs:
         docker load -i ~/docker-cache/ubuntu
     - name: Build docker image
       run: docker-compose -f docker-compose-ci.yml build
-    - name: Build shellgei_web_server command
+    - name: Build websh_server command
       run: docker-compose -f docker-compose-ci.yml run --rm build_server
-    - name: Build shellgei_web_front JS
+    - name: Build websh_front JS
       run: docker-compose -f docker-compose-ci.yml run --rm build_front
     - name: Archive release files
       run: |
-        mkdir -p dist/shellgei_web
-        cp -r shellgei_web_server/bin dist/shellgei_web
-        cp -r shellgei_web_front/public dist/shellgei_web
+        mkdir -p dist/websh
+        cp -r websh_server/bin dist/websh
+        cp -r websh_front/public dist/websh
         pushd dist
-        tar czf shellgei_web.tar.gz shellgei_web
+        tar czf websh.tar.gz websh
         popd
-        ls -lah dist/shellgei_web.tar.gz
+        ls -lah dist/websh.tar.gz
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
       with:
-        files: dist/shellgei_web.tar.gz
+        files: dist/websh.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Save docker ubuntu image to cache directory
