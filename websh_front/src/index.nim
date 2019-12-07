@@ -31,7 +31,7 @@ proc createDom(): VNode =
     tdiv(class = &"row {baseColor} {textColor}"):
       nav:
         tdiv(class = &"nav-wrapper {baseColor}"):
-          a(class = &"brand-logo {textColor}"): text "Shellgei Web"
+          a(class = &"brand-logo {textColor}"): text "websh"
       tdiv(class = "col s6"):
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
