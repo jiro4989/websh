@@ -1,4 +1,4 @@
-import asyncdispatch, os, osproc, strutils, json, random, logging, base64
+import asyncdispatch, os, osproc, strutils, json, random, base64
 from strformat import `&`
 
 import jester, uuids
@@ -6,6 +6,13 @@ import jester, uuids
 type
   RespShellgeiJSON* = object
     code*: string
+
+proc info(msgs: varargs[string, `$`]) =
+  ## **Note:** マルチスレッドだとloggingモジュールがうまく機能しないので仮で実装
+  var s: string
+  for msg in msgs:
+    s.add(msg)
+  echo "INFO " & s
 
 router myrouter:
   post "/shellgei":
