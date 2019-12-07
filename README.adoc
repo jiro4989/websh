@@ -10,7 +10,7 @@ https://github.com/theoremoon/ShellgeiBot[シェル芸bot]のWeb移植の
 https://github.com/kekeho/SGWeb[SGWeb]というWebアプリがある。
 
 最新のシェル芸botに追従してなかったので、試しに自分が最新のシェル芸botに追従する
-Webアプリ作って公開してみよう、という試みから。
+Webアプリ作って公開してみるか、と思ったから。
 あとWebアプリを作る勉強もかねて。
 
 == 実装
