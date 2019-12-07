@@ -1,8 +1,8 @@
 from os import `/`
 
 let
-  frontDir = thisDir() / "shellgei_web_front"
-  serverDir = thisDir() / "shellgei_web_server"
+  frontDir = thisDir() / "websh_front"
+  serverDir = thisDir() / "websh_server"
   siteUrl = "http://localhost/"
 
 task run, "コンテナ停止してビルドして全部起動しなおす":
@@ -12,17 +12,17 @@ task run, "コンテナ停止してビルドして全部起動しなおす":
   selfExec "up"
   selfExec "runServer"
 
-task buildFront, "shellgei_web_frontのJSをビルドする":
+task buildFront, "websh_frontのJSをビルドする":
   withDir frontDir:
     exec "nimble build -Y"
 
-task buildServer, "shellgei_web_serverをビルドする":
+task buildServer, "websh_serverをビルドする":
   withDir serverDir:
     exec "nimble build -Y"
 
-task runServer, "shellgei_web_serverを起動する":
+task runServer, "websh_serverを起動する":
   withDir serverDir:
-    exec "./bin/shellgei_web_server"
+    exec "./bin/websh_server"
 
 task up, "Dockerコンテナを起動する":
   echo siteUrl
