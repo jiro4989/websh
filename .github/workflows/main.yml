@@ -7,17 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Cache ubuntu image
-      id: cache-ubuntu-image
-      uses: actions/cache@v1
-      with:
-        path: ~/docker-cache
-        key: ${{ runner.os }}-docker-ubuntu-${{ hashFiles('**/Dockerfile') }}
-    - name: Load docker image
-      if: steps.cache-ubuntu-image.outputs.cache-hit == 'true'
-      run: |
-        gunzip ~/docker-cache/ubuntu.gz
-        docker load -i ~/docker-cache/ubuntu
     - name: Pull docker image
       run: docker pull jiro4989/websh:latest
     - name: Build
@@ -38,10 +27,6 @@ jobs:
         files: dist/websh.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Save docker ubuntu image to cache directory
-      run: |
-        mkdir -p ~/docker-cache
-        docker save ubuntu:18.04 | gzip -c > ~/docker-cache/ubuntu.gz
 
   deploy:
     runs-on: ubuntu-latest
