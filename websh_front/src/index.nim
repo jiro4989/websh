@@ -72,7 +72,7 @@ proc createDom(): VNode =
       tdiv(class = "footer-copyright"):
         tdiv(class = "container"):
           text "© 2019 jiro4989, "
-          a(href = "https://github.com/jiro4989/shellgei_web"): text "Repository"
+          a(href = "https://github.com/jiro4989/websh"): text "Repository"
           text ", MIT License"
 
 setRenderer createDom
