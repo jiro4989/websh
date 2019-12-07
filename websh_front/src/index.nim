@@ -13,7 +13,7 @@ const
   baseColor = "grey darken-4"
   textColor = "green-text darken-3"
   textInputColor = "grey-text lighten-5"
-  apiUrl = "http://localhost/api/shellgei"
+  apiUrl = "https://websh.jiro4989.com/api/shellgei"
 
 var
   inputShell = cstring""
