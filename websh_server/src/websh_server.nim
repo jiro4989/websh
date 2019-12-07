@@ -50,7 +50,7 @@ router myrouter:
       # "-v", "./media:/media:ro",
       "theoldmoon0602/shellgeibot",
       #"theoldmoon0602/shellgeibot:master",
-      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 20 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let outp = execProcess("docker", args = args, options = {poUsePath})
     info outp
