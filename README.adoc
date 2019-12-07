@@ -23,6 +23,18 @@ Webアプリ作って公開してみるか、と思ったから。
 ** Nim (jester)
 ** Docker
 
+== API
+
+実体はフロントエンドのHTMLからAPIリクエストして実行結果を受け取ってるだけです。
+なので普通にcurlでPOSTリクエスト送れば画面がなくても動きます。
+
+以下のようなリクエストを送ればコマンドラインからwebshを使用できます。
+
+[source,bash]
+----
+curl -X POST -d '{"code":"echo hello"}' 'https://websh.jiro4989.com/api/shellgei'
+----
+
 == プルリクエスト
 
 デザインとか超手抜きですので、プルリクエストお待ちしてます。
