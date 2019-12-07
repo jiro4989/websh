@@ -1,4 +1,4 @@
-import asyncdispatch, os, osproc, strutils, json, random, base64
+import asyncdispatch, os, osproc, strutils, json, random, base64, times
 from strformat import `&`
 
 import jester, uuids
@@ -12,7 +12,10 @@ proc info(msgs: varargs[string, `$`]) =
   var s: string
   for msg in msgs:
     s.add(msg)
-  echo "INFO " & s
+  let now = now()
+  let dt = now.format("yyyy-MM-dd")
+  let ti = now.format("HH:mm:ss")
+  echo &"{dt}T{ti}+0900 INFO {s}"
 
 router myrouter:
   post "/shellgei":
