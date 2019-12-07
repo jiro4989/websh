@@ -40,6 +40,9 @@ jobs:
         files: dist/shellgei_web.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Deploy application
+      run: echo deploy
+      if: success()
     - name: Save docker ubuntu image to cache directory
       run: |
         mkdir -p ~/docker-cache
