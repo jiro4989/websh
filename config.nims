@@ -14,7 +14,7 @@ task run, "コンテナ停止してビルドして全部起動しなおす":
 
 task buildFront, "websh_frontのJSをビルドする":
   withDir frontDir:
-    exec "nimble build -Y"
+    exec "nimble build -Y -d:local"
 
 task buildServer, "websh_serverをビルドする":
   withDir serverDir:
