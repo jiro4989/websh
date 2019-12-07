@@ -1,4 +1,4 @@
 /bin/
 
-websh_server/bin/shellgei_web_server
+websh_server/bin/websh_server
 websh_front/public/js/index.js
