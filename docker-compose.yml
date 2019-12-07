@@ -5,7 +5,7 @@ services:
     image: nginx:1.17
     volumes:
       - "./proxy/conf.d:/etc/nginx/conf.d:ro"
-      - "./shellgei_web_front/public:/var/www:ro"
+      - "./websh_front/public:/var/www:ro"
     ports:
       - "80:80"
     network_mode: "host"
