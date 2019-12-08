@@ -23,11 +23,25 @@ Webアプリ作って公開してみるか、と思ったから。
 ** Nim (jester)
 ** Docker
 
-.システム構成図
-image:./docs/system.svg[システム構成図]
+=== ローカル環境
+
+シェル芸botのDockerコンテナをDockerコンテナ内で起動したくなかった(docker on docker)ので
+websh_serverをホストPCで実行するようにしている。
+
+nginxはコンテナ内からホストPCのwebsh_serverにリバースプロキシしてシェル芸botコンテナを操作する。
 
 .ローカル環境の構成図
 image:./docs/local.svg[システム構成図(ローカル)]
+
+=== 本番環境
+
+docker on dockerにしないためにwebsh_serverをホストPC上で動作させるようにしたのと
+デプロイをシンボリックリンクで切り替える構成にした関係でnginxをコンテナ上で起動してhtmlをマウントできなかった。
+しかたなくローカルと構成が違うけれど、nginxもホストPC上で動作させるようにした。
+本番環境ではシェル芸botコンテナのみDockerで動作させている。
+
+.システム構成図
+image:./docs/system.svg[システム構成図]
 
 == インフラ
 
