@@ -76,6 +76,8 @@ router myrouter:
       images.add(data)
 
     resp %*{"stdout":outp, "stderr":"", "images":images}
+  get "/ping":
+    resp %*{"status":"ok"}
 
 proc main =
   var port = getEnv("SHELLGEI_WEB_PORT", "5000").parseInt().Port
