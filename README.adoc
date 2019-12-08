@@ -35,12 +35,12 @@ image:./docs/local.svg[システム構成図(ローカル)]
 
 === 本番環境
 
+Infrastructure as Codeしている。
+ソースコードは https://github.com/jiro4989/infra[infra]リポジトリで管理。
+以下はアプリレベルでの構成図。
+
 .システム構成図
 image:./docs/system.svg[システム構成図]
-
-== インフラ
-
-https://github.com/jiro4989/infra[infra]リポジトリで管理。
 
 == API
 
