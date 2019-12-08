@@ -1,4 +1,4 @@
-= shellgei-web
+= websh
 :toc: left
 :sectnums:
 
@@ -81,11 +81,11 @@ http://localhost
 
 === フロントエンド
 
-websh_frontディレクトリ配下のREADMEを参照。
+link:./websh_front/README.adoc[websh_frontディレクトリ配下のREADME]を参照。
 
 === バックエンド
 
-websh_serverディレクトリ配下のREADMEを参照。
+link:./websh_server/README.adoc[websh_serverディレクトリ配下のREADME]を参照。
 
 === CI
 
