@@ -30,3 +30,6 @@ task up, "Dockerコンテナを起動する":
 
 task down, "Dockerコンテナを停止(down)する":
   exec "docker-compose down"
+
+task pullShellgeiBotImage, "シェル芸botのDockerイメージを取得する":
+  exec "docker pull theoldmoon0602/shellgeibot"
