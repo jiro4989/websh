@@ -23,9 +23,11 @@ Webアプリ作って公開してみるか、と思ったから。
 ** Nim (jester)
 ** Docker
 
-システム構成図
-
+.システム構成図
 image:./docs/system.svg[システム構成図]
+
+.ローカル環境の構成図
+image:./docs/local.svg[システム構成図(ローカル)]
 
 == インフラ
 
