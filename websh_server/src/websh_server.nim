@@ -1,4 +1,4 @@
-import asyncdispatch, os, osproc, strutils, json, random, base64, times
+import asyncdispatch, os, osproc, strutils, json, random, base64, times, streams
 from strformat import `&`
 
 import jester, uuids
@@ -16,6 +16,25 @@ proc info(msgs: varargs[string, `$`]) =
   let dt = now.format("yyyy-MM-dd")
   let ti = now.format("HH:mm:ss")
   echo &"{dt}T{ti}+0900 INFO {s}"
+
+proc runCommand(command: string, args: openArray[string]): (string, string) =
+  ## ``command`` を実行し、標準出力と標準エラー出力を返す。
+  var
+    p = startProcess(command, args = args, options = {poUsePath})
+    stdoutStr, stderrStr: string
+  while p.running():
+    block:
+      var strm = p.outputStream
+      var line: string
+      while strm.readLine(line):
+        stdoutStr.add(line)
+    block:
+      var strm = p.errorStream
+      var line: string
+      while strm.readLine(line):
+        stderrStr.add(line)
+  p.close()
+  result = (stdoutStr, stderrStr)
 
 router myrouter:
   post "/shellgei":
@@ -85,5 +104,5 @@ proc main =
   var jester = initJester(myrouter, settings = settings)
   jester.serve()
 
-when isMainModule:
+when isMainModule and not defined modeTest:
   main()
