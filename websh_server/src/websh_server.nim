@@ -63,7 +63,6 @@ router myrouter:
 
     createDir(imageDir)
     let containerShellScriptPath = &"/tmp/{scriptName}"
-    let name = "unko"
     let args = [
       "run",
       "--rm",
