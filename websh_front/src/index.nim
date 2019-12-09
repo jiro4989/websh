@@ -30,7 +30,6 @@ var
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
   outputStdout = resp.stdout
-  outputStderr = resp.stderr
   outputImages = resp.images
 
 proc createDom(): VNode =
@@ -63,13 +62,13 @@ proc createDom(): VNode =
         tdiv:
           h4: text "Stdout"
           tdiv(class = "input-field col s12"):
-            textarea(id = "outputStdout", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"200px")):
+            textarea(id = "outputStdout", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"400px")):
               text outputStdout
-        tdiv:
-          h4: text "Stderr"
-          tdiv(class = "input-field col s12"):
-            textarea(id = "outputStderr", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"200px")):
-              text outputStderr
+        # tdiv:
+        #   h4: text "Stderr"
+        #   tdiv(class = "input-field col s12"):
+        #     textarea(id = "outputStderr", class = "materialize-textarea"):
+        #       text outputStderr
         tdiv:
           h4: text "Images"
           for img in outputImages:
