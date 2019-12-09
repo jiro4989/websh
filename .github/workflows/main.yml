@@ -9,8 +9,12 @@ jobs:
     - uses: actions/checkout@v1
     - name: Pull docker image
       run: docker pull jiro4989/websh:latest
-    - name: Build
-      run: docker-compose -f docker-compose-ci.yml up
+    - name: Test server
+      run: docker-compose -f docker-compose-ci.yml run server test -Y
+    - name: Build server
+      run: docker-compose -f docker-compose-ci.yml run server
+    - name: Build front
+      run: docker-compose -f docker-compose-ci.yml run front
     - name: Archive release files
       run: |
         mkdir -p dist/websh
