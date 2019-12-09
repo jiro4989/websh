@@ -20,8 +20,7 @@ proc info(msgs: varargs[string, `$`]) =
 proc readStream(strm: var Stream): string =
   defer: strm.close()
   var lines: seq[string]
-  var line: string
-  while strm.readLine(line):
+  for line in strm.lines:
     lines.add(line)
   result = lines.join("\n")
 
@@ -30,14 +29,16 @@ proc runCommand(command: string, args: openArray[string]): (string, string) =
   var
     p = startProcess(command, args = args, options = {poUsePath})
     stdoutStr, stderrStr: string
+  defer: p.close()
   while p.running():
-    block:
-      var strm = p.outputStream
-      stdoutStr = strm.readStream()
-    block:
-      var strm = p.errorStream
-      stderrStr = strm.readStream()
-  p.close()
+    # プロセスが処理完了するまで待機
+    sleep 10
+  block:
+    var strm = p.outputStream
+    stdoutStr = strm.readStream()
+  block:
+    var strm = p.errorStream
+    stderrStr = strm.readStream()
   result = (stdoutStr, stderrStr)
 
 router myrouter:
