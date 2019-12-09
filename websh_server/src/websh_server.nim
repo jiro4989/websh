@@ -78,7 +78,7 @@ router myrouter:
       #"theoldmoon0602/shellgeibot:master",
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 20 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
-    let outp = execProcess("docker", args = args, options = {poUsePath})
+    let (stdoutStr, stderrStr) = runCommand("docker", args)
 
     # 画像ファイルをbase64に変換
     var images: seq[string]
@@ -93,7 +93,7 @@ router myrouter:
       let data = meta & base64.encode(readFile(path))
       images.add(data)
 
-    resp %*{"stdout":outp, "stderr":"", "images":images}
+    resp %*{"stdout":stdoutStr, "stderr":stderrStr, "images":images}
   get "/ping":
     resp %*{"status":"ok"}
 
