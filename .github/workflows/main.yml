@@ -13,6 +13,22 @@ jobs:
       run: docker-compose -f docker-compose-ci.yml run server test -Y
     - name: Build server
       run: docker-compose -f docker-compose-ci.yml run server
+    - name: Test API
+      run: |
+        pushd websh_server
+        WEBSH_DOCKER_IMAGE=jiro4989/websh ./bin/websh_server &
+        pid=$!
+        sleep 2
+        # 出力内容を確認する用
+        curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello"}' 'http://0.0.0.0:5000/shellgei'
+        # 標準出力のテスト
+        cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello"}' 'http://0.0.0.0:5000/shellgei' | grep hello | wc -l)
+        [ "$cnt" -eq 1 ]
+        # 標準エラー出力のテスト
+        cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello >&2"}' 'http://0.0.0.0:5000/shellgei' | grep hello | wc -l)
+        [ "$cnt" -eq 1 ]
+        kill $pid
+        popd
     - name: Build front
       run: docker-compose -f docker-compose-ci.yml run front
     - name: Archive release files
@@ -34,25 +50,3 @@ jobs:
     - name: Deploy application
       run: curl ${{ secrets.WEBHOOK_URL }}
       if: startsWith(github.ref, 'refs/tags/')
-
-  test-api:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Pull docker image
-      run: docker pull jiro4989/websh:latest
-    - name: Pull shellgeibot-image image
-      run: docker pull theoldmoon0602/shellgeibot:latest
-    - name: Build server
-      run: docker-compose -f docker-compose-ci.yml run server
-    - name: Test API
-      run: |
-        pushd websh_server
-        ./bin/websh_server &
-        pid=$!
-        cnt=$(curl --connect-timeout 5 -X POST -d '{"code":"echo hello"}' 'http://localhost:5000/shellgei' | grep hello | wc -l)
-        [ "$cnt" -eq 1 ]
-        cnt=$(curl --connect-timeout 5 -X POST -d '{"code":"echo hello >&2"}' 'http://localhost:5000/shellgei' | grep hello | wc -l)
-        [ "$cnt" -eq 1 ]
-        kill $pid
-        popd
