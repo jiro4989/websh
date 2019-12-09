@@ -1,4 +1,4 @@
-import asyncdispatch, os, osproc, strutils, json, random, base64, times, streams
+import asyncdispatch, os, osproc, strutils, json, base64, times, streams
 from strformat import `&`
 
 import jester, uuids
@@ -17,6 +17,14 @@ proc info(msgs: varargs[string, `$`]) =
   let ti = now.format("HH:mm:ss")
   echo &"{dt}T{ti}+0900 INFO {s}"
 
+proc readStream(strm: var Stream): string =
+  defer: strm.close()
+  var lines: seq[string]
+  var line: string
+  while strm.readLine(line):
+    lines.add(line)
+  result = lines.join("\n")
+
 proc runCommand(command: string, args: openArray[string]): (string, string) =
   ## ``command`` を実行し、標準出力と標準エラー出力を返す。
   var
@@ -25,14 +33,10 @@ proc runCommand(command: string, args: openArray[string]): (string, string) =
   while p.running():
     block:
       var strm = p.outputStream
-      var line: string
-      while strm.readLine(line):
-        stdoutStr.add(line)
+      stdoutStr = strm.readStream()
     block:
       var strm = p.errorStream
-      var line: string
-      while strm.readLine(line):
-        stderrStr.add(line)
+      stderrStr = strm.readStream()
   p.close()
   result = (stdoutStr, stderrStr)
 
