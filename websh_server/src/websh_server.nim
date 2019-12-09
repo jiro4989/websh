@@ -1,4 +1,4 @@
-import asyncdispatch, os, osproc, strutils, json, random, base64, times
+import asyncdispatch, os, osproc, strutils, json, base64, times, streams
 from strformat import `&`
 
 import jester, uuids
@@ -16,6 +16,29 @@ proc info(msgs: varargs[string, `$`]) =
   let dt = now.format("yyyy-MM-dd")
   let ti = now.format("HH:mm:ss")
   echo &"{dt}T{ti}+0900 INFO {s}"
+
+proc readStream(strm: var Stream): string =
+  defer: strm.close()
+  var lines: seq[string]
+  var line: string
+  while strm.readLine(line):
+    lines.add(line)
+  result = lines.join("\n")
+
+proc runCommand(command: string, args: openArray[string]): (string, string) =
+  ## ``command`` を実行し、標準出力と標準エラー出力を返す。
+  var
+    p = startProcess(command, args = args, options = {poUsePath})
+    stdoutStr, stderrStr: string
+  while p.running():
+    block:
+      var strm = p.outputStream
+      stdoutStr = strm.readStream()
+    block:
+      var strm = p.errorStream
+      stderrStr = strm.readStream()
+  p.close()
+  result = (stdoutStr, stderrStr)
 
 router myrouter:
   post "/shellgei":
@@ -44,7 +67,6 @@ router myrouter:
 
     createDir(imageDir)
     let containerShellScriptPath = &"/tmp/{scriptName}"
-    let name = "unko"
     let args = [
       "run",
       "--rm",
@@ -60,7 +82,7 @@ router myrouter:
       #"theoldmoon0602/shellgeibot:master",
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 20 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
-    let outp = execProcess("docker", args = args, options = {poUsePath})
+    let (stdoutStr, stderrStr) = runCommand("docker", args)
 
     # 画像ファイルをbase64に変換
     var images: seq[string]
@@ -75,7 +97,7 @@ router myrouter:
       let data = meta & base64.encode(readFile(path))
       images.add(data)
 
-    resp %*{"stdout":outp, "stderr":"", "images":images}
+    resp %*{"stdout":stdoutStr, "stderr":stderrStr, "images":images}
   get "/ping":
     resp %*{"status":"ok"}
 
@@ -85,5 +107,5 @@ proc main =
   var jester = initJester(myrouter, settings = settings)
   jester.serve()
 
-when isMainModule:
+when isMainModule and not defined modeTest:
   main()
