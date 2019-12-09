@@ -66,8 +66,10 @@ router myrouter:
       removeDir(imageDir)
       info &"{imageDir} was removed"
 
+    # コマンドを実行するDockerイメージ名
     createDir(imageDir)
     let containerShellScriptPath = &"/tmp/{scriptName}"
+    let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
     let args = [
       "run",
       "--rm",
@@ -79,8 +81,7 @@ router myrouter:
       "-v", &"{shellScriptPath}:{containerShellScriptPath}",
       "-v", &"{imageDir}:/{img}",
       # "-v", "./media:/media:ro",
-      "theoldmoon0602/shellgeibot",
-      #"theoldmoon0602/shellgeibot:master",
+      imageName,
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 20 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let (stdoutStr, stderrStr) = runCommand("docker", args)
@@ -103,7 +104,7 @@ router myrouter:
     resp %*{"status":"ok"}
 
 proc main =
-  var port = getEnv("SHELLGEI_WEB_PORT", "5000").parseInt().Port
+  var port = getEnv("WEBSH_PORT", "5000").parseInt().Port
   var settings = newSettings(port = port)
   var jester = initJester(myrouter, settings = settings)
   jester.serve()
