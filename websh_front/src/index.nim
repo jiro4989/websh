@@ -74,7 +74,8 @@ proc createDom(): VNode =
           h4: text "Images"
           for img in outputImages:
             tdiv:
-              img(src = img)
+              # imgでbase64を表示するときに必要なメタ情報を追加
+              img(src = "data:image/png;base64," & img)
     footer(class = &"page-footer {baseColor}"):
       tdiv(class = "footer-copyright"):
         tdiv(class = "container"):
