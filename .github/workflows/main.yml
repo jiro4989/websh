@@ -36,6 +36,7 @@ jobs:
         mkdir -p dist/websh
         cp -r websh_server/bin dist/websh
         cp -r websh_front/public dist/websh
+        git describe --tags --abbrev=0 > dist/websh/tag.txt
         pushd dist
         tar czf websh.tar.gz websh
         popd
