@@ -94,10 +94,7 @@ router myrouter:
       let (dir, name, ext) = splitFile(path)
       if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
         continue
-      # JavaScriptのimg.srcにセットする時のプレフィックス
-      let meta = "data:image/png;base64,"
-      let data = meta & base64.encode(readFile(path))
-      images.add(data)
+      images.add(base64.encode(readFile(path)))
 
     resp %*{"stdout":stdoutStr, "stderr":stderrStr, "images":images}
   get "/ping":
