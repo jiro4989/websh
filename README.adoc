@@ -37,7 +37,7 @@ image:./docs/local.svg[システム構成図(ローカル)]
 === 本番環境
 
 Infrastructure as Codeしている。
-ソースコードは https://github.com/jiro4989/infra[infra]リポジトリで管理。
+ソースコードは https://github.com/jiro4989/infra[infra]リポジトリ（非公開）で管理。
 以下はアプリレベルでの構成図。
 
 .システム構成図
