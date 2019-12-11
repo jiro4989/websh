@@ -118,6 +118,10 @@ link:./websh_server/README.adoc[websh_serverディレクトリ配下のREADME]�
 
 デザインとか超手抜きですので、プルリクエストお待ちしてます。
 
+== LISENCE
+
+Apache License
+
 == 多謝
 
 * https://github.com/theoremoon/ShellgeiBot[シェル芸bot]
