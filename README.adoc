@@ -3,6 +3,7 @@
 :sectnums:
 
 シェル芸botのDockerイメージを利用したWeb移植。
+このアプリは https://github.com/theoremoon/ShellgeiBot-Image[シェル芸botのDockerイメージ] を使用しています。
 
 image:./docs/top.png[]
 
