@@ -79,8 +79,9 @@ proc createDom(): VNode =
     footer(class = &"page-footer {baseColor}"):
       tdiv(class = "footer-copyright"):
         tdiv(class = "container"):
-          text "© 2019 jiro4989, "
-          text ", MIT License, "
+          text "© 2019, jiro4989 ("
+          a(href = "https://twitter.com/jiro_saburomaru"): text "@jiro_saburomaru"
+          text "), MIT License, "
           a(href = "https://github.com/jiro4989/websh"): text "Repository"
           text ", "
           a(href = "https://stats.uptimerobot.com/EZnRXc325K"): text "Public Status Page"
