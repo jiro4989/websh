@@ -81,7 +81,7 @@ proc createDom(): VNode =
         tdiv(class = "container"):
           text "© 2019, jiro4989 ("
           a(href = "https://twitter.com/jiro_saburomaru"): text "@jiro_saburomaru"
-          text "), Apache License "
+          text "), Apache License, "
           a(href = "https://github.com/jiro4989/websh"): text "Repository"
           text ", "
           a(href = "https://stats.uptimerobot.com/EZnRXc325K"): text "Public Status Page"
