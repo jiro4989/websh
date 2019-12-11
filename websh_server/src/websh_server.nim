@@ -82,7 +82,7 @@ router myrouter:
       "-v", &"{imageDir}:/{img}",
       # "-v", "./media:/media:ro",
       imageName,
-      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 20 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && timeout -sKILL 3 {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let (stdoutStr, stderrStr) = runCommand("docker", args)
 
