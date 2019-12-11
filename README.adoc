@@ -40,7 +40,7 @@ Infrastructure as Codeしている。
 以下はアプリレベルでの構成図。
 
 .システム構成図
-image:./docs/system.svg[システム構成図]
+image:./docs/system.png[システム構成図]
 
 == API
 
