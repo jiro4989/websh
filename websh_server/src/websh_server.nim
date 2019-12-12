@@ -24,15 +24,23 @@ proc readStream(strm: var Stream): string =
     lines.add(line)
   result = lines.join("\n")
 
-proc runCommand(command: string, args: openArray[string]): (string, string) =
+proc runCommand(command: string, args: openArray[string], timeout: int = 3): (string, string) =
   ## ``command`` を実行し、標準出力と標準エラー出力を返す。
+  ## timeout は秒を指定する。
   var
     p = startProcess(command, args = args, options = {poUsePath})
     stdoutStr, stderrStr: string
   defer: p.close()
+  let sleepInterval = 10 # ミリ秒
+  let timeoutMilSec = timeout * 1000
+  var elapsedTime: int
   while p.running():
     # プロセスが処理完了するまで待機
-    sleep 10
+    sleep sleepInterval
+    elapsedTime += sleepInterval
+    if timeoutMilSec < elapsedTime:
+      info &"Over timeout: {timeout} second"
+      return
   block:
     var strm = p.outputStream
     stdoutStr = strm.readStream()
