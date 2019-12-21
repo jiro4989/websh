@@ -115,6 +115,8 @@ link:./websh_server/README.adoc[websh_serverディレクトリ配下のREADME]�
 
 前述のCIの通り、タグを切ると自動でリリースされる。
 
+image:./docs/release_flow.svg[]
+
 == プルリクエスト
 
 デザインとか超手抜きですので、プルリクエストお待ちしてます。
