@@ -75,7 +75,9 @@ proc createDom(): VNode =
         tdiv(class = "input-field col s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
             proc onkeydown(ev: Event, n: VNode) =
-              if cast[KeyboardEvent](ev).keyCode == 13:
+              let kbEvt = cast[KeyboardEvent](ev)
+              # Ctrl + Enterで実行
+              if kbEvt.ctrlKey and kbEvt.keyCode == 13:
                 sendShellButtonOnClick(ev, n)
             proc onkeyup(ev: Event, n: VNode) =
               inputShell = $n.value
