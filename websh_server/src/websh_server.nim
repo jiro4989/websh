@@ -92,7 +92,8 @@ router myrouter:
       imageName,
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
-    let (stdoutStr, stderrStr) = runCommand("docker", args)
+    let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
+    let (stdoutStr, stderrStr) = runCommand("docker", args, timeout)
 
     # 画像ファイルをbase64に変換
     var images: seq[string]
