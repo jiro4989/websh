@@ -1,5 +1,5 @@
 = websh
-:toc: left
+:toc:
 :sectnums:
 
 https://github.com/theoremoon/ShellgeiBot-Image[シェル芸botのDockerイメージ] を利用したWeb移植。
@@ -127,19 +127,31 @@ link:./websh_server/README.adoc[websh_serverディレクトリ配下のREADME]�
 
 === CI
 
-`.github` ディレクトリ配下に設定を配置している。
-以下処理フロー。
+`.github` ディレクトリ配下にワークフローを定義している。
+ビルド、テスト、デプロイのフローは `.github/workflows/main.yml` に定義している。
 
-. DockerHubから開発環境のDockerイメージを取得
-. docker-compose upでフロントのJSとバックエンドのバイナリを生成
-. リリース用にファイルを圧縮
-. (以降はタグを切ったときだけ)
-.. 圧縮したファイルをGitHub Releaseにリリース
-.. 本番サーバ上のWebhookにGETリクエストを送信してリリース物をデプロイ
+CIのジョブフローは以下。
+
+image:./docs/ci-main.svg[]
+
+masterブランチでのpush、margeの場合は `create-tag-draft` が実行される。
+
+`create-tag-draft` ではタグのドラフトを作成する。
+タグのドラフトは、PRの説明から自動でセットされる。
+Feature/BugFixなどの分類は、 PR時のラベルでカテゴライズされる。
+
+PR時のラベルはブランチのプレフィックスから自動でセットされる。
+ブランチ命名規則については <<開発,ブランチ運用>> を参照。
+
+タグドラフトをpublishするとデプロイが実行され、サーバ上にmasterのビルド成果物をデプロイする。
 
 === デプロイ方法
 
-前述のCIの通り、タグを切ると自動でリリースされる。
+前述のCIの通り、リリースを作成すると自動でデプロイされる。
+
+リリースの下書きはGitHub Actionsが下書きを作成する。
+下書きをpublishすると、GitHub Actionが起動して、デプロイされる。
+以下はデプロイのフロー。
 
 image:./docs/release_flow.svg[]
 

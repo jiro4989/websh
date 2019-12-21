@@ -1,0 +1,22 @@
+@startuml
+
+start
+
+: [skip ci]の判定 (before) ;
+if (コミットタイトルに[skip ci]が含まれるか？) then (true)
+    end
+endif
+: ビルド、テスト (build) ;
+fork
+    if (masterへのpushか？) then (true)
+        : release draft作成 (create-tag-draft) ;
+    endif
+fork again
+    if (リリースか？) then (true)
+        : デプロイ (deploy) ;
+    endif
+end fork
+
+end
+
+@enduml
