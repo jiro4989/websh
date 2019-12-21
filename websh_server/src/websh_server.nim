@@ -50,7 +50,7 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
     sleep sleepInterval
     elapsedTime += sleepInterval
     if timeoutMilSec < elapsedTime:
-      let msg = &"Over timeout: {timeout} second"
+      let msg = &"timeout: {timeout} second"
       info msg
       return ("", "", statusTimeout, msg)
   block:
