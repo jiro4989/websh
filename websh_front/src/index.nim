@@ -33,6 +33,16 @@ proc respCb(httpStatus: int, response: cstring) =
   outputStderr = resp.stderr
   outputImages = resp.images
 
+proc sendShellButtonOnClick(ev: Event, n: VNode) =
+  let body = %*{"code": inputShell}
+  ajaxPost(apiUrl,
+    headers = @[
+      (cstring"mode", cstring"cors"),
+      (cstring"cache", cstring"no-cache"),
+      ],
+    data = body.toJson,
+    cont = respCb)
+
 proc createDom(): VNode =
   result = buildHtml(tdiv):
     tdiv(class = &"row {baseColor} {textColor}"):
@@ -43,21 +53,15 @@ proc createDom(): VNode =
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
+            proc onkeydown(ev: Event, n: VNode) =
+              if cast[KeyboardEvent](ev).keyCode == 13:
+                sendShellButtonOnClick(ev, n)
             proc onkeyup(ev: Event, n: VNode) =
               inputShell = $n.value
           label(`for` = "inputShell"):
             text "ex: echo 'Hello shell'"
-        button:
-          text "Run"
-          proc onclick(ev: Event, n: VNode) =
-            let body = %*{"code": inputShell}
-            ajaxPost(apiUrl,
-              headers = @[
-                (cstring"mode", cstring"cors"),
-                (cstring"cache", cstring"no-cache"),
-                ],
-              data = body.toJson,
-              cont = respCb)
+        button(onclick = sendShellButtonOnClick):
+          text "Run (Ctrl + Enter)"
         a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
             class = "twitter-share-button",
             `data-show-count` = "false"):
