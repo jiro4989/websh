@@ -1,0 +1,35 @@
+@startuml
+
+Actor developer as dev
+participant GitHub as gh
+participant GitHubActions as act
+participant GitHubRelease as rel
+participant Server as server
+
+dev -> gh : masterマージ
+activate gh
+gh -> act : Action起動
+activate act
+act -> rel : 下書き作成
+activate rel
+act -> gh : 完了通知
+deactivate act
+gh -> dev : 完了通知
+deactivate gh
+
+dev -> rel : 公開
+rel -> act : Event hook
+activate act
+act -> act : 成果物をビルド
+act -> rel : 成果物リリース
+act -> server : webhook
+activate server
+server -> rel : デプロイ対象取得
+rel -> server : デプロイ対象返却
+deactivate rel
+server -> server : デプロイ
+server -> act : 完了通知
+deactivate server
+deactivate act
+
+@enduml
