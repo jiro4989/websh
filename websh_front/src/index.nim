@@ -26,14 +26,20 @@ var
   outputStdout = cstring""
   outputStderr = cstring""
   outputImages: seq[cstring]
+  isProgress: bool
+    ## シェルの実行中表示を切り替えるためのフラグ
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
   outputStdout = resp.stdout
   outputStderr = resp.stderr
   outputImages = resp.images
+  # シェルの実行中表示 OFF
+  isProgress = false
 
 proc sendShellButtonOnClick(ev: Event, n: VNode) =
+  # シェルの実行中表示 ON
+  isProgress = true
   let body = %*{"code": inputShell}
   ajaxPost(apiUrl,
     headers = @[
@@ -50,6 +56,9 @@ proc createDom(): VNode =
         tdiv(class = &"nav-wrapper {baseColor}"):
           a(class = &"brand-logo {textColor}"): text "websh"
       tdiv(class = "col s6"):
+        if isProgress:
+          tdiv(class = "col s12 m12"):
+            text "Running ..."
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
