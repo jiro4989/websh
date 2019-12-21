@@ -5,6 +5,8 @@ import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, j
 
 type
   ResponseResult = object
+    status: cint
+    system_message: cstring
     stdout: cstring
     stderr: cstring
     images: seq[cstring]
@@ -13,6 +15,9 @@ const
   baseColor = "grey darken-4"
   textColor = "green-text darken-3"
   textInputColor = "grey-text lighten-5"
+  statusOk = cint(0)
+  statusTimeout = cint(1)
+  statusSystemError = cint(100)
 
 when defined local:
   # ローカル開発用
@@ -23,17 +28,27 @@ else:
 
 var
   inputShell = cstring""
+  outputStatus = cint(0)
+  outputSystemMessage = cstring""
   outputStdout = cstring""
   outputStderr = cstring""
   outputImages: seq[cstring]
+  isProgress: bool
+    ## シェルの実行中表示を切り替えるためのフラグ
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
+  outputStatus = resp.status
+  outputSystemMessage = resp.system_message
   outputStdout = resp.stdout
   outputStderr = resp.stderr
   outputImages = resp.images
+  # シェルの実行中表示 OFF
+  isProgress = false
 
 proc sendShellButtonOnClick(ev: Event, n: VNode) =
+  # シェルの実行中表示 ON
+  isProgress = true
   let body = %*{"code": inputShell}
   ajaxPost(apiUrl,
     headers = @[
@@ -50,11 +65,19 @@ proc createDom(): VNode =
         tdiv(class = &"nav-wrapper {baseColor}"):
           a(class = &"brand-logo {textColor}"): text "websh"
       tdiv(class = "col s6"):
+        if isProgress:
+          tdiv(class = "col s12 m12"):
+            text "Running ..."
+        if outputStatus != statusOk:
+          tdiv(class = "col s12 m12"):
+            text outputSystemMessage
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
             proc onkeydown(ev: Event, n: VNode) =
-              if cast[KeyboardEvent](ev).keyCode == 13:
+              let kbEvt = cast[KeyboardEvent](ev)
+              # Ctrl + Enterで実行
+              if kbEvt.ctrlKey and kbEvt.keyCode == 13:
                 sendShellButtonOnClick(ev, n)
             proc onkeyup(ev: Event, n: VNode) =
               inputShell = $n.value
