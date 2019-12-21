@@ -50,7 +50,7 @@ jobs:
 
   create-tag-draft:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/tags/master'
+    if: github.ref == 'refs/heads/master'
     needs: build
     steps:
       - uses: release-drafter/release-drafter@v5.3.1
