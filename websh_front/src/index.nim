@@ -5,6 +5,8 @@ import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, j
 
 type
   ResponseResult = object
+    status: cint
+    system_message: cstring
     stdout: cstring
     stderr: cstring
     images: seq[cstring]
@@ -13,6 +15,9 @@ const
   baseColor = "grey darken-4"
   textColor = "green-text darken-3"
   textInputColor = "grey-text lighten-5"
+  statusOk = cint(0)
+  statusTimeout = cint(1)
+  statusSystemError = cint(100)
 
 when defined local:
   # ローカル開発用
@@ -23,6 +28,8 @@ else:
 
 var
   inputShell = cstring""
+  outputStatus = cint(0)
+  outputSystemMessage = cstring""
   outputStdout = cstring""
   outputStderr = cstring""
   outputImages: seq[cstring]
@@ -31,6 +38,8 @@ var
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
+  outputStatus = resp.status
+  outputSystemMessage = resp.system_message
   outputStdout = resp.stdout
   outputStderr = resp.stderr
   outputImages = resp.images
@@ -59,9 +68,12 @@ proc createDom(): VNode =
         if isProgress:
           tdiv(class = "col s12 m12"):
             text "Running ..."
+        if outputStatus != statusOk:
+          tdiv(class = "col s12 m12"):
+            text outputSystemMessage
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
-          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
+          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
             proc onkeydown(ev: Event, n: VNode) =
               if cast[KeyboardEvent](ev).keyCode == 13:
                 sendShellButtonOnClick(ev, n)
