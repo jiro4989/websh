@@ -52,7 +52,7 @@ proc createDom(): VNode =
       tdiv(class = "col s6"):
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
-          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
+          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
             proc onkeydown(ev: Event, n: VNode) =
               if cast[KeyboardEvent](ev).keyCode == 13:
                 sendShellButtonOnClick(ev, n)
