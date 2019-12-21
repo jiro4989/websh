@@ -58,6 +58,10 @@ proc createDom(): VNode =
                 ],
               data = body.toJson,
               cont = respCb)
+        a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
+            class = "twitter-share-button",
+            `data-show-count` = "false"):
+          text "Tweet"
       tdiv(class = "col s6"):
         h3: text "Output"
         tdiv:
