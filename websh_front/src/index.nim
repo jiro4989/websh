@@ -73,7 +73,7 @@ proc createDom(): VNode =
             text outputSystemMessage
         h3: text "Input"
         tdiv(class = "input-field col s12 m6"):
-          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true):
+          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
             proc onkeydown(ev: Event, n: VNode) =
               let kbEvt = cast[KeyboardEvent](ev)
               # Ctrl + Enterで実行
