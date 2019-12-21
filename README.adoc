@@ -2,15 +2,14 @@
 :toc: left
 :sectnums:
 
-シェル芸botのDockerイメージを利用したWeb移植。
-このアプリは https://github.com/theoremoon/ShellgeiBot-Image[シェル芸botのDockerイメージ] を使用しています。
+https://github.com/theoremoon/ShellgeiBot-Image[シェル芸botのDockerイメージ] を利用したWeb移植。
 
 image:./docs/top.png[]
 
 == 背景
 
-https://github.com/theoremoon/ShellgeiBot[シェル芸bot]のWeb移植の
-https://github.com/kekeho/SGWeb[SGWeb]というWebアプリがある。
+https://github.com/theoremoon/ShellgeiBot[シェル芸bot] のWeb移植の
+https://github.com/kekeho/SGWeb[SGWeb] というWebアプリがある。
 
 最新のシェル芸botに追従してなかったので、試しに自分が最新のシェル芸botに追従する
 Webアプリ作って公開してみるか、と思ったから。
@@ -95,11 +94,15 @@ http://localhost
 
 以下の5種類のブランチを使う。
 
-* master 本番用
-* develop たまに使うが基本放置
-* feature/#xx 新機能、UI改善
-* hotfix/#xx バグ修正
-* chore/#xx CIやローカル開発環境の整備など、アプリに影響しない雑多なもの
+[options="header"]
+|=================
+| ブランチ名    | 説明
+| master      | 本番用
+| develop     | たまに使うが基本放置
+| feature/#xx | 新機能、UI改善
+| hotfix/#xx  | バグ修正
+| chore/#xx   | CIやローカル開発環境の整備など、アプリに影響しない雑多なもの
+|=================
 
 feature, hotfix, choreのブランチ名のプレフィックスは、PR作成時のラベル自動付与にも使用している。
 よって、必ずブランチ命名規則を守ること。
