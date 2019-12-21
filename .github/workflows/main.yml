@@ -73,7 +73,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: application/dist/websh.tar.gz
+          files: application/websh.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy application
