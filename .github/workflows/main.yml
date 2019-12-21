@@ -1,6 +1,10 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
 
 jobs:
   build:
