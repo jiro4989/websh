@@ -1,4 +1,4 @@
-import strformat, strutils
+from strformat import `&`
 from unicode import isAlpha, toRunes, runeAt, `==`, `$`
 from uri import encodeUrl
 from sequtils import mapIt, toSeq
