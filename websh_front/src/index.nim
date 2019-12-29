@@ -90,15 +90,15 @@ proc createDom(): VNode =
         tdiv(class = "input-field s12 m6"):
           let count = countWord($inputShell)
           tdiv(class = "s12 m6"):
-            text &"Current input: {$count} chars"
+            text &"{$count} chars"
           let remain = 280 - count
-          let remainPercent = int(count / remain * 100)
+          let remainPercent = int(count / 280 * 100)
           let color =
             if 100 <= remainPercent: "red darken-3"
             elif 70 <= remainPercent: "yellow darken-4"
             else: ""
           tdiv(class = &"s12 m6 {color}"):
-            text &"Remaining input: {$remain} chars ({$remainPercent}%)."
+            text &"Remaining: {$remain} chars ({$remainPercent}%)."
         tdiv(class = "input-field s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
             proc onkeydown(ev: Event, n: VNode) =
