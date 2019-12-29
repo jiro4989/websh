@@ -1,3 +1,4 @@
+from strutils import split
 from strformat import `&`
 from unicode import isAlpha, toRunes, runeAt, `==`, `$`
 from uri import encodeUrl
@@ -120,11 +121,17 @@ proc createDom(): VNode =
         h3: text "Output"
         tdiv:
           h4: text "Stdout"
+          tdiv(class = "s12 m6"):
+            text &"{countWord($outputStdout)} chars, "
+            text &"""{$($outputStdout).split("\n").len} lines"""
           tdiv(class = "input-field col s12"):
             textarea(id = "outputStdout", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"200px")):
               text outputStdout
         tdiv:
           h4: text "Stderr"
+          tdiv(class = "s12 m6"):
+            text &"{countWord($outputStderr)} chars, "
+            text &"""{$($outputStderr).split("\n").len} lines"""
           tdiv(class = "input-field col s12"):
             textarea(id = "outputStderr", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"200px")):
               text outputStderr
