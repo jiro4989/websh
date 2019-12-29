@@ -93,7 +93,11 @@ proc createDom(): VNode =
             text &"Current input: {$count} chars"
           let remain = 280 - count
           let remainPercent = int(count / remain * 100)
-          tdiv(class = "s12 m6"):
+          let color =
+            if 100 <= remainPercent: "red darken-3"
+            elif 70 <= remainPercent: "yellow darken-4"
+            else: ""
+          tdiv(class = &"s12 m6 {color}"):
             text &"Remaining input: {$remain} chars ({$remainPercent}%)."
         tdiv(class = "input-field s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
