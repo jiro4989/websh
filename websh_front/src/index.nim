@@ -1,5 +1,7 @@
-import strformat, strutils
+from strformat import `&`
+from unicode import isAlpha, toRunes, runeAt, `==`, `$`
 from uri import encodeUrl
+from sequtils import mapIt, toSeq
 
 import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, jjson, kajax]
 
@@ -18,6 +20,9 @@ const
   statusOk = cint(0)
   statusTimeout = cint(1)
   statusSystemError = cint(100)
+
+let
+  byte1Runes = toSeq(0..255).mapIt(chr(it).`$`.runeAt(0))
 
 when defined local:
   # ローカル開発用
@@ -46,8 +51,7 @@ proc respCb(httpStatus: int, response: cstring) =
   # シェルの実行中表示 OFF
   isProgress = false
 
-proc sendShellButtonOnClick(ev: Event, n: VNode) =
-  # シェルの実行中表示 ON
+proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示 ON
   isProgress = true
   let body = %*{"code": inputShell}
   ajaxPost(apiUrl,
@@ -57,6 +61,17 @@ proc sendShellButtonOnClick(ev: Event, n: VNode) =
       ],
     data = body.toJson,
     cont = respCb)
+
+proc countWord(s: string): int =
+  ## 文字数をカウントする。
+  ## アルファベットは1文字、マルチバイト文字は2文字として数える。
+  for c in s.toRunes():
+    if c in byte1Runes:
+      # アルファベットのとき
+      inc(result)
+    else:
+      # それ以外はマルチバイト文字のはず（たぶん）
+      inc(result, 2)
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
@@ -72,7 +87,19 @@ proc createDom(): VNode =
           tdiv(class = "col s12 m12"):
             text outputSystemMessage
         h3: text "Input"
-        tdiv(class = "input-field col s12 m6"):
+        tdiv(class = "input-field s12 m6"):
+          let count = countWord($inputShell)
+          tdiv(class = "s12 m6"):
+            text &"Current input: {$count} chars"
+          let remain = 280 - count
+          let remainPercent = int(count / remain * 100)
+          let color =
+            if 100 <= remainPercent: "red darken-3"
+            elif 70 <= remainPercent: "yellow darken-4"
+            else: ""
+          tdiv(class = &"s12 m6 {color}"):
+            text &"Remaining input: {$remain} chars ({$remainPercent}%)."
+        tdiv(class = "input-field s12 m6"):
           textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
             proc onkeydown(ev: Event, n: VNode) =
               let kbEvt = cast[KeyboardEvent](ev)
@@ -117,4 +144,5 @@ proc createDom(): VNode =
           text ", "
           a(href = "https://stats.uptimerobot.com/EZnRXc325K"): text "Public Status Page"
 
-setRenderer createDom
+when not defined modeTest:
+  setRenderer createDom
