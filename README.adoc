@@ -58,6 +58,14 @@ curl -X POST -d '{"code":"echo hello"}' 'https://websh.jiro4989.com/api/shellgei
 
 == 開発
 
+=== 前提条件
+
+以下のツールがインストールされている必要があります。
+
+* https://nim-lang.org/[nim]
+* docker
+* docker-compose
+
 === ファイル・ディレクトリ構成
 
 [options="header"]
