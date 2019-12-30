@@ -39,24 +39,35 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
     p = startProcess(command, args = args, options = {poUsePath})
     stdoutStr, stderrStr: string
   defer: p.close()
-  let sleepInterval = 10 # ミリ秒
-  let timeoutMilSec = timeout * 1000
-  var elapsedTime: int
-  while p.running():
-    # プロセスが処理完了するまで待機
-    sleep sleepInterval
-    elapsedTime += sleepInterval
-    if timeoutMilSec < elapsedTime:
-      let msg = &"timeout: {timeout} second"
-      info msg
-      return ("", "", statusTimeout, msg)
+
+  let
+    timeoutMilSec = timeout * 1000
+    exitCode = waitForExit(p, timeout = timeoutMilSec)
+
+  # 処理結果の判定
+  var
+    status: int
+    msg: string
+  if exitCode == 0:
+    status = statusOk
+  elif exitCode == 137:
+    status = statusTimeout
+    msg = &"timeout: {timeout} second"
+    info &"exitCode={exitCode}, msg={msg}"
+  else:
+    status = statusSystemError
+    msg = &"failed to run command: command={command}, args={args}"
+    error &"exitCode={exitCode}, msg={msg}"
+
+  # 出力の取得
   block:
     var strm = p.outputStream
     stdoutStr = strm.readStream()
   block:
     var strm = p.errorStream
     stderrStr = strm.readStream()
-  result = (stdoutStr, stderrStr, statusOk, "")
+
+  result = (stdoutStr, stderrStr, status, msg)
 
 router myrouter:
   post "/shellgei":
