@@ -6,6 +6,9 @@ import jester, uuids
 type
   ReqShellgeiJSON* = object
     code*: string
+  ImageObj* = object
+    image*: string
+    filesize*: int
 
 const
   statusOk = 0
@@ -117,14 +120,16 @@ router myrouter:
       let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
 
       # 画像ファイルをbase64に変換
-      var images: seq[string]
+      var images: seq[ImageObj]
       for kind, path in walkDir(imageDir):
         if kind != pcFile:
           continue
         let (dir, name, ext) = splitFile(path)
         if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
           continue
-        images.add(base64.encode(readFile(path)))
+        let content = readFile(path)
+        let img = ImageObj(image: base64.encode(content), filesize: content.len)
+        images.add(img)
 
       resp %*{"status":status, "system_message":systemMsg, "stdout":stdoutStr, "stderr":stderrStr, "images":images}
     except:
