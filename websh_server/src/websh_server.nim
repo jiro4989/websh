@@ -49,7 +49,13 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
     if timeoutMilSec < elapsedTime:
       let msg = &"timeout: {timeout} second"
       info msg
-      return ("", "", statusTimeout, msg)
+      block:
+        var strm = p.outputStream
+        stdoutStr = strm.readStream()
+      block:
+        var strm = p.errorStream
+        stderrStr = strm.readStream()
+      return (stdoutStr, stderrStr, statusTimeout, msg)
   block:
     var strm = p.outputStream
     stdoutStr = strm.readStream()
