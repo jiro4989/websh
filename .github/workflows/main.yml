@@ -3,6 +3,8 @@ name: build
 on:
   push:
   pull_request:
+  release:
+    types: [published]
 
 jobs:
   before:
@@ -65,6 +67,12 @@ jobs:
       - uses: release-drafter/release-drafter@v5.3.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    steps:
       - name: Download artifact
         uses: actions/download-artifact@v1
         with:
@@ -75,3 +83,5 @@ jobs:
           files: application/websh.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy application
+        run: curl ${{ secrets.WEBHOOK_URL }}
