@@ -50,10 +50,14 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
     msg: string
   if exitCode == 0:
     status = statusOk
-  else:
+  elif exitCode == 137:
     status = statusTimeout
     msg = &"timeout: {timeout} second"
-    info msg
+    info &"exitCode={exitCode}, msg={msg}"
+  else:
+    status = statusSystemError
+    msg = &"failed to run command: command={command}, args={args}"
+    error &"exitCode={exitCode}, msg={msg}"
 
   # 出力の取得
   block:
