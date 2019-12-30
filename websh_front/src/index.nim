@@ -12,7 +12,10 @@ type
     system_message: cstring
     stdout: cstring
     stderr: cstring
-    images: seq[cstring]
+    images: seq[ImageObj]
+  ImageObj = object
+    image: cstring
+    filesize: cint
 
 const
   baseColor = "grey darken-4"
@@ -38,7 +41,7 @@ var
   outputSystemMessage = cstring""
   outputStdout = cstring""
   outputStderr = cstring""
-  outputImages: seq[cstring]
+  outputImages: seq[ImageObj]
   isProgress: bool
     ## シェルの実行中表示を切り替えるためのフラグ
 
@@ -140,7 +143,9 @@ proc createDom(): VNode =
           for img in outputImages:
             tdiv:
               # imgでbase64を表示するときに必要なメタ情報を追加
-              img(src = "data:image/png;base64," & img)
+              img(src = "data:image/png;base64," & img.image)
+            tdiv:
+              text &"{img.filesize} byte"
     footer(class = &"page-footer {baseColor}"):
       tdiv(class = "footer-copyright"):
         tdiv(class = "container"):
