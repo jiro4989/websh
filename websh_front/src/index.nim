@@ -66,6 +66,15 @@ proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示
     data = body.toJson,
     cont = respCb)
 
+proc inputTextareaOnkeydown(ev: Event, n: VNode) =
+  let kbEvt = cast[KeyboardEvent](ev)
+  # Ctrl + Enterで実行
+  if kbEvt.ctrlKey and kbEvt.keyCode == 13:
+    sendShellButtonOnClick(ev, n)
+
+proc inputTextareaOnkeyup(ev: Event, n: VNode) =
+  inputShell = $n.value
+
 proc countWord(s: string): int =
   ## 文字数をカウントする。
   ## アルファベットは1文字、マルチバイト文字は2文字として数える。
@@ -79,76 +88,82 @@ proc countWord(s: string): int =
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
-    tdiv(class = &"row {baseColor} {textColor}"):
-      nav:
-        tdiv(class = &"nav-wrapper {baseColor}"):
-          a(class = &"brand-logo {textColor}"): text "websh"
-      tdiv(class = "col s6"):
-        if isProgress:
-          tdiv(class = "col s12 m12"):
-            text "Running ..."
-        if outputStatus != statusOk:
-          tdiv(class = "col s12 m12"):
-            text outputSystemMessage
-        h3: text "Input"
-        tdiv(class = "input-field s12 m6"):
-          let count = countWord($inputShell)
-          tdiv(class = "s12 m6"):
-            text &"{$count} chars"
-          let remain = 280 - count
-          let remainPercent = int(count / 280 * 100)
-          let color =
-            if 100 <= remainPercent: "red darken-3"
-            elif 70 <= remainPercent: "yellow darken-4"
-            else: ""
-          tdiv(class = &"s12 m6 {color}"):
-            text &"Remaining: {$remain} chars ({$remainPercent}%)."
-        tdiv(class = "input-field s12 m6"):
-          textarea(id = "inputShell", class = &"materialize-textarea {textInputColor}", setFocus = true, style = style(StyleAttr.minHeight, cstring"400px")):
-            proc onkeydown(ev: Event, n: VNode) =
-              let kbEvt = cast[KeyboardEvent](ev)
-              # Ctrl + Enterで実行
-              if kbEvt.ctrlKey and kbEvt.keyCode == 13:
-                sendShellButtonOnClick(ev, n)
-            proc onkeyup(ev: Event, n: VNode) =
-              inputShell = $n.value
-          label(`for` = "inputShell"):
-            text "ex: echo 'Hello shell'"
-        button(onclick = sendShellButtonOnClick):
-          text "Run (Ctrl + Enter)"
-        a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
-            class = "twitter-share-button",
-            `data-show-count` = "false"):
-          text "Tweet"
-      tdiv(class = "col s6"):
-        h3: text "Output"
-        tdiv:
-          h4: text "Stdout"
-          tdiv(class = "s12 m6"):
-            text &"{countWord($outputStdout)} chars, "
-            text &"""{$($outputStdout).split("\n").len} lines"""
-          tdiv(class = "input-field col s12"):
-            textarea(id = "outputStdout", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"200px")):
-              text outputStdout
-        tdiv:
-          h4: text "Stderr"
-          tdiv(class = "s12 m6"):
-            text &"{countWord($outputStderr)} chars, "
-            text &"""{$($outputStderr).split("\n").len} lines"""
-          tdiv(class = "input-field col s12"):
-            textarea(id = "outputStderr", class = &"materialize-textarea {textInputColor}", style = style(StyleAttr.minHeight, cstring"200px")):
-              text outputStderr
-        tdiv:
-          h4: text "Images"
-          for img in outputImages:
-            tdiv:
-              # imgでbase64を表示するときに必要なメタ情報を追加
-              img(src = "data:image/png;base64," & img.image)
-            tdiv:
-              text &"{img.filesize} byte"
-    footer(class = &"page-footer {baseColor}"):
-      tdiv(class = "footer-copyright"):
+
+    tdiv(class = "hero is-info is-bold"):
+      tdiv(class = "hero-body"):
         tdiv(class = "container"):
+          tdiv(class = "content has-text-centered"):
+            h1(class = "title"): text "websh"
+
+    tdiv(class = "tile is-ancestor"):
+      tdiv(class = "tile is-parent is-primary"):
+        article(class = "tile is-child notification"):
+          p(class = "title"): text "input"
+          tdiv(class = "content"):
+            tdiv:
+              let count = countWord($inputShell)
+              tdiv:
+                text &"{$count} chars"
+              let remain = 280 - count
+              let remainPercent = int(count / 280 * 100)
+              let color =
+                if 100 <= remainPercent: "red darken-3"
+                elif 70 <= remainPercent: "yellow darken-4"
+                else: ""
+              tdiv:
+                text &"Remaining: {$remain} chars ({$remainPercent}%)."
+            textarea(class = "textarea",
+                     placeholder="ex: echo 'Hello shell'",
+                     setFocus = true,
+                     onkeydown = inputTextareaOnkeydown,
+                     onkeyup = inputTextareaOnkeyup,
+                     )
+            tdiv(class = "buttons"):
+              button(class="button is-primary", onclick = sendShellButtonOnClick):
+                text "Run (Ctrl + Enter)"
+              button(class = "button is-link"):
+                a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
+                    class = "twitter-share-button",
+                    `data-show-count` = "false"):
+                  text "Tweet"
+            if isProgress:
+              tdiv:
+                text "Running ..."
+            if outputStatus != statusOk:
+              tdiv:
+                text outputSystemMessage
+      tdiv(class = "tile is-parent is-vertical"):
+        article(class = "tile is-child notification"):
+          p(class = "title"): text "stdout"
+          tdiv(class = "content"):
+            tdiv:
+              text &"{countWord($outputStdout)} chars, "
+              text &"""{$($outputStdout).split("\n").len} lines"""
+            tdiv:
+              textarea(class = "textarea"):
+                text outputStdout
+        article(class = "tile is-child notification"):
+          p(class = "title"): text "stderr"
+          tdiv(class = "content"):
+            tdiv:
+              text &"{countWord($outputStderr)} chars, "
+              text &"""{$($outputStderr).split("\n").len} lines"""
+            tdiv:
+              textarea(class = "textarea"):
+                text outputStderr
+        article(class = "tile is-child notification"):
+          p(class = "title"): text "images"
+          tdiv(class = "content"):
+            for img in outputImages:
+              tdiv:
+                # imgでbase64を表示するときに必要なメタ情報を追加
+                img(src = "data:image/png;base64," & img.image)
+              tdiv:
+                text &"{img.filesize} byte"
+
+    footer(class = &"footer"):
+      tdiv(class = "container"):
+        tdiv(class = "content has-text-centered"):
           text "© 2019, jiro4989 ("
           a(href = "https://twitter.com/jiro_saburomaru"): text "@jiro_saburomaru"
           text "), Apache License, "
