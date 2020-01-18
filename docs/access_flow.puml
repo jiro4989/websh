@@ -16,12 +16,12 @@ node "Host" {
     }
 }
 
-net -down-> [nginx]
+net -down-> [nginx] : http[s]://websh.jiro4989.com/
 [nginx] -down-> (80)
 [nginx] -down-> (443)
 (80) -> [nginx] : 443リダイレクト
-(443) -down-> [index.html]
-(443) -down-> [websh_server]
+(443) -down-> [index.html] : GET /index.html
+(443) -down-> [websh_server] : POST /api/shellgei
 [websh_server] -down-> [docker]
 
 @enduml
