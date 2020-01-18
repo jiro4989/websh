@@ -112,12 +112,13 @@ proc createDom(): VNode =
                 else: ""
               tdiv:
                 text &"Remaining: {$remain} chars ({$remainPercent}%)."
-            textarea(class = "textarea",
-                     placeholder="ex: echo 'Hello shell'",
-                     setFocus = true,
-                     onkeydown = inputTextareaOnkeydown,
-                     onkeyup = inputTextareaOnkeyup,
-                     )
+            tdiv:
+              textarea(class = "textarea",
+                       placeholder="ex: echo 'Hello shell'",
+                       setFocus = true,
+                       onkeydown = inputTextareaOnkeydown,
+                       onkeyup = inputTextareaOnkeyup,
+                       )
             tdiv(class = "buttons"):
               button(class="button is-primary", onclick = sendShellButtonOnClick):
                 text "Run (Ctrl + Enter)"
