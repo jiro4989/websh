@@ -119,10 +119,10 @@ proc createDom(): VNode =
               let remain = 280 - count
               let remainPercent = int(count / 280 * 100)
               let color =
-                if 100 <= remainPercent: "red darken-3"
-                elif 70 <= remainPercent: "yellow darken-4"
+                if 100 <= remainPercent: "has-background-danger"
+                elif 70 <= remainPercent: "has-background-warning"
                 else: ""
-              tdiv:
+              tdiv(class = color):
                 text &"Remaining: {$remain} chars ({$remainPercent}%)."
           tdiv(class = "content"):
             tdiv:
