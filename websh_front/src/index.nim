@@ -107,67 +107,71 @@ proc createDom(): VNode =
               text "none"
 
     # 入力、出力スペース
-    tdiv(class = "tile is-ancestor"):
-      tdiv(class = "tile is-parent is-primary"):
-        article(class = "tile is-child notification"):
-          p(class = "title"): text "input"
-          p(class = "subtitle"):
-            tdiv:
-              let count = countWord($inputShell)
-              tdiv:
-                text &"{$count} chars"
-              let remain = 280 - count
-              let remainPercent = int(count / 280 * 100)
-              let color =
-                if 100 <= remainPercent: "has-background-danger"
-                elif 70 <= remainPercent: "has-background-warning"
-                else: ""
-              tdiv(class = color):
-                text &"Remaining: {$remain} chars ({$remainPercent}%)."
-          tdiv(class = "content"):
-            tdiv:
-              textarea(class = "textarea is-primary",
-                       placeholder = "ex: echo 'Hello shell'",
-                       rows = "15",
-                       setFocus = true,
-                       onkeydown = inputTextareaOnkeydown,
-                       onkeyup = inputTextareaOnkeyup,
-                       )
-            tdiv(class = "buttons"):
-              button(class="button is-primary", onclick = sendShellButtonOnClick):
-                text "Run (Ctrl + Enter)"
-              a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
-                  class = "button twitter-share-button is-link",
-                  `data-show-count` = "false"):
-                text "Tweet"
-      tdiv(class = "tile is-parent is-vertical"):
-        article(class = "tile is-child notification"):
-          p(class = "title"): text "stdout"
-          p(class = "subtitle"):
-            tdiv:
-              text &"{countWord($outputStdout)} chars, "
-              text &"""{$($outputStdout).split("\n").len} lines"""
-            tdiv:
-              textarea(class = "textarea is-success", rows = "5"):
-                text outputStdout
-        article(class = "tile is-child notification"):
-          p(class = "title"): text "stderr"
-          p(class = "subtitle"):
-            tdiv:
-              text &"{countWord($outputStderr)} chars, "
-              text &"""{$($outputStderr).split("\n").len} lines"""
-            tdiv:
-              textarea(class = "textarea is-warning", rows = "3"):
-                text outputStderr
-        article(class = "tile is-child notification"):
-          p(class = "title"): text "images"
-          tdiv(class = "content"):
-            for img in outputImages:
-              tdiv:
-                # imgでbase64を表示するときに必要なメタ情報を追加
-                img(src = "data:image/png;base64," & img.image)
-              tdiv:
-                text &"{img.filesize} byte"
+    tdiv(class = "columns is-desktop"):
+      tdiv(class = "column"):
+        tdiv(class = "tile is-ancestor"):
+          tdiv(class = "tile is-parent is-vertical"):
+            article(class = "tile is-child notification"):
+              p(class = "title"): text "input"
+              p(class = "subtitle"):
+                tdiv:
+                  let count = countWord($inputShell)
+                  tdiv:
+                    text &"{$count} chars"
+                  let remain = 280 - count
+                  let remainPercent = int(count / 280 * 100)
+                  let color =
+                    if 100 <= remainPercent: "has-background-danger"
+                    elif 70 <= remainPercent: "has-background-warning"
+                    else: ""
+                  tdiv(class = color):
+                    text &"Remaining: {$remain} chars ({$remainPercent}%)."
+              tdiv(class = "content"):
+                tdiv:
+                  textarea(class = "textarea is-primary",
+                           placeholder = "ex: echo 'Hello shell'",
+                           rows = "15",
+                           setFocus = true,
+                           onkeydown = inputTextareaOnkeydown,
+                           onkeyup = inputTextareaOnkeyup,
+                           )
+                tdiv(class = "buttons"):
+                  button(class="button is-primary", onclick = sendShellButtonOnClick):
+                    text "Run (Ctrl + Enter)"
+                  a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
+                      class = "button twitter-share-button is-link",
+                      `data-show-count` = "false"):
+                    text "Tweet"
+      tdiv(class = "column"):
+        tdiv(class = "tile is-ancestor"):
+          tdiv(class = "tile is-parent is-vertical"):
+            article(class = "tile is-child notification"):
+              p(class = "title"): text "stdout"
+              p(class = "subtitle"):
+                tdiv:
+                  text &"{countWord($outputStdout)} chars, "
+                  text &"""{$($outputStdout).split("\n").len} lines"""
+                tdiv:
+                  textarea(class = "textarea is-success", rows = "8"):
+                    text outputStdout
+            article(class = "tile is-child notification"):
+              p(class = "title"): text "stderr"
+              p(class = "subtitle"):
+                tdiv:
+                  text &"{countWord($outputStderr)} chars, "
+                  text &"""{$($outputStderr).split("\n").len} lines"""
+                tdiv:
+                  textarea(class = "textarea is-warning", rows = "4"):
+                    text outputStderr
+            article(class = "tile is-child notification"):
+              p(class = "title"): text "images"
+              tdiv(class = "content"):
+                for img in outputImages:
+                  tdiv:
+                    # imgでbase64を表示するときに必要なメタ情報を追加
+                    img(src = "data:image/png;base64," & img.image)
+                  tdiv:
+                    text &"{img.filesize} byte"
 
     footer(class = &"footer"):
       tdiv(class = "container"):
