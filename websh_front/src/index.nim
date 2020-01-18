@@ -18,9 +18,6 @@ type
     filesize: cint
 
 const
-  baseColor = "grey darken-4"
-  textColor = "green-text darken-3"
-  textInputColor = "grey-text lighten-5"
   statusOk = cint(0)
   statusTimeout = cint(1)
   statusSystemError = cint(100)
@@ -113,8 +110,9 @@ proc createDom(): VNode =
               tdiv:
                 text &"Remaining: {$remain} chars ({$remainPercent}%)."
             tdiv:
-              textarea(class = "textarea",
-                       placeholder="ex: echo 'Hello shell'",
+              textarea(class = "textarea is-primary",
+                       placeholder = "ex: echo 'Hello shell'",
+                       rows = "20",
                        setFocus = true,
                        onkeydown = inputTextareaOnkeydown,
                        onkeyup = inputTextareaOnkeyup,
@@ -141,7 +139,7 @@ proc createDom(): VNode =
               text &"{countWord($outputStdout)} chars, "
               text &"""{$($outputStdout).split("\n").len} lines"""
             tdiv:
-              textarea(class = "textarea"):
+              textarea(class = "textarea is-success"):
                 text outputStdout
         article(class = "tile is-child notification"):
           p(class = "title"): text "stderr"
@@ -150,7 +148,7 @@ proc createDom(): VNode =
               text &"{countWord($outputStderr)} chars, "
               text &"""{$($outputStderr).split("\n").len} lines"""
             tdiv:
-              textarea(class = "textarea"):
+              textarea(class = "textarea is-warning"):
                 text outputStderr
         article(class = "tile is-child notification"):
           p(class = "title"): text "images"
