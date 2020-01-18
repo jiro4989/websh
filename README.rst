@@ -200,8 +200,8 @@ Apache License
 .. _`シェル芸Bot`: https://github.com/theoremoon/ShellgeiBot
 .. _SGWeb: https://github.com/kekeho/SGWeb
 .. _infra: https://github.com/jiro4989/infra
-.. _`websh_frontディレクトリ配下のREADME`: ./websh_front/README.adoc
-.. _`websh_serverディレクトリ配下のREADME`: ./websh_server/README.adoc
+.. _`websh_frontディレクトリ配下のREADME`: ./websh_front/README.rst
+.. _`websh_serverディレクトリ配下のREADME`: ./websh_server/README.rst
 
 .. |image-top| image:: ./docs/top.png
 .. |image-local| image:: ./docs/local.svg
