@@ -152,7 +152,7 @@ proc createDom(): VNode =
                   text &"{countWord($outputStdout)} chars, "
                   text &"""{$($outputStdout).split("\n").len} lines"""
                 tdiv:
-                  textarea(class = "textarea is-success", rows = "5"):
+                  textarea(class = "textarea is-success", rows = "8"):
                     text outputStdout
             article(class = "tile is-child notification"):
               p(class = "title"): text "stderr"
@@ -161,7 +161,7 @@ proc createDom(): VNode =
                   text &"{countWord($outputStderr)} chars, "
                   text &"""{$($outputStderr).split("\n").len} lines"""
                 tdiv:
-                  textarea(class = "textarea is-warning", rows = "3"):
+                  textarea(class = "textarea is-warning", rows = "4"):
                     text outputStderr
             article(class = "tile is-child notification"):
               p(class = "title"): text "images"
