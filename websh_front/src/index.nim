@@ -86,7 +86,7 @@ proc countWord(s: string): int =
 proc createDom(): VNode =
   result = buildHtml(tdiv):
 
-    tdiv(class = "hero is-info is-bold"):
+    section(class = "hero is-info"):
       tdiv(class = "hero-body"):
         tdiv(class = "container"):
           tdiv(class = "content has-text-centered"):
@@ -96,7 +96,7 @@ proc createDom(): VNode =
       tdiv(class = "tile is-parent is-primary"):
         article(class = "tile is-child notification"):
           p(class = "title"): text "input"
-          tdiv(class = "content"):
+          p(class = "subtitle"):
             tdiv:
               let count = countWord($inputShell)
               tdiv:
@@ -109,10 +109,11 @@ proc createDom(): VNode =
                 else: ""
               tdiv:
                 text &"Remaining: {$remain} chars ({$remainPercent}%)."
+          tdiv(class = "content"):
             tdiv:
               textarea(class = "textarea is-primary",
                        placeholder = "ex: echo 'Hello shell'",
-                       rows = "20",
+                       rows = "15",
                        setFocus = true,
                        onkeydown = inputTextareaOnkeydown,
                        onkeyup = inputTextareaOnkeyup,
@@ -134,21 +135,21 @@ proc createDom(): VNode =
       tdiv(class = "tile is-parent is-vertical"):
         article(class = "tile is-child notification"):
           p(class = "title"): text "stdout"
-          tdiv(class = "content"):
+          p(class = "subtitle"):
             tdiv:
               text &"{countWord($outputStdout)} chars, "
               text &"""{$($outputStdout).split("\n").len} lines"""
             tdiv:
-              textarea(class = "textarea is-success"):
+              textarea(class = "textarea is-success", rows = "5"):
                 text outputStdout
         article(class = "tile is-child notification"):
           p(class = "title"): text "stderr"
-          tdiv(class = "content"):
+          p(class = "subtitle"):
             tdiv:
               text &"{countWord($outputStderr)} chars, "
               text &"""{$($outputStderr).split("\n").len} lines"""
             tdiv:
-              textarea(class = "textarea is-warning"):
+              textarea(class = "textarea is-warning", rows = "3"):
                 text outputStderr
         article(class = "tile is-child notification"):
           p(class = "title"): text "images"
