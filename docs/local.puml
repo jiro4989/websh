@@ -1,0 +1,16 @@
+@startuml
+
+Actor Developer as dev
+node "PC" {
+    frame "Docker" {
+        [nginx]
+        [shellgeibot]
+    }
+    [websh_server]
+}
+
+dev -down-> [nginx] : POST http://localhost/api/shellgei
+[nginx] -down-> [websh_server] : Proxy to http://127.0.1.1:5000/shellgei
+[websh_server] -down-> [shellgeibot] : docker run
+
+@enduml
