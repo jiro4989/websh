@@ -86,12 +86,27 @@ proc countWord(s: string): int =
 proc createDom(): VNode =
   result = buildHtml(tdiv):
 
+    # ヘッダー
     section(class = "hero is-info"):
       tdiv(class = "hero-body"):
         tdiv(class = "container"):
           tdiv(class = "content has-text-centered"):
             h1(class = "title"): text "websh"
 
+    # システムメッセージの表示
+    nav(class = "level"):
+      tdiv(class = "level-item has-text-centered"):
+        tdiv:
+          p(class = "heading"): text "system message"
+          p(class = "title"):
+            if isProgress:
+              text "Running ..."
+            elif outputStatus != statusOk:
+              text outputSystemMessage
+            else:
+              text "none"
+
+    # 入力、出力スペース
     tdiv(class = "tile is-ancestor"):
       tdiv(class = "tile is-parent is-primary"):
         article(class = "tile is-child notification"):
@@ -126,12 +141,6 @@ proc createDom(): VNode =
                     class = "twitter-share-button",
                     `data-show-count` = "false"):
                   text "Tweet"
-            if isProgress:
-              tdiv:
-                text "Running ..."
-            if outputStatus != statusOk:
-              tdiv:
-                text outputSystemMessage
       tdiv(class = "tile is-parent is-vertical"):
         article(class = "tile is-child notification"):
           p(class = "title"): text "stdout"
