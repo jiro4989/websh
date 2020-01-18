@@ -1,0 +1,27 @@
+@startuml
+
+cloud "Internet" as net
+node "Host" {
+    [nginx]
+    frame "Port" {
+        (80)
+        (443)
+    }
+    frame "Static file" {
+        [index.html]
+    }
+    frame "Process" {
+        [websh_server]
+        [docker]
+    }
+}
+
+net -down-> [nginx]
+[nginx] -down-> (80)
+[nginx] -down-> (443)
+(80) -> [nginx] : 443リダイレクト
+(443) -down-> [index.html]
+(443) -down-> [websh_server]
+[websh_server] -down-> [docker]
+
+@enduml
