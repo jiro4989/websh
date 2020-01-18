@@ -87,7 +87,7 @@ proc createDom(): VNode =
   result = buildHtml(tdiv):
 
     # ヘッダー
-    section(class = "hero is-info"):
+    section(class = "hero is-dark"):
       tdiv(class = "hero-body"):
         tdiv(class = "container"):
           tdiv(class = "content has-text-centered"):
