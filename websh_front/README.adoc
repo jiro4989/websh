@@ -8,7 +8,8 @@
 
 == フレームワーク
 
-* karax (SPAフレームワーク)
+* https://github.com/pragmagic/karax[karax] (SPAフレームワーク)
+* https://bulma.io/[bulma] (CSSフレームワーク)
 
 == フロントエンド構成
 

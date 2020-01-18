@@ -106,12 +106,12 @@ http://localhost
 
 [options="header"]
 |=================
-| ブランチ名    | 説明
-| master      | 本番用
-| develop     | たまに使うが基本放置
-| feature/#xx | 新機能、UI改善
-| hotfix/#xx  | バグ修正
-| chore/#xx   | CIやローカル開発環境の整備など、アプリに影響しない雑多なもの
+| ブランチ名       | 説明
+| master           | 本番用
+| develop          | たまに使うが基本放置
+| feature/#xx-desc | 新機能、UI改善
+| hotfix/#xx-desc  | バグ修正
+| chore/#xx-desc   | CIやローカル開発環境の整備など、アプリに影響しない雑多なもの
 |=================
 
 feature, hotfix, choreのブランチ名のプレフィックスは、PR作成時のラベル自動付与にも使用している。
