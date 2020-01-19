@@ -2,7 +2,7 @@
 websh
 =====
 
-|ci-release| |ci-test|
+|ci-test|
 
 `シェル芸botのDockerイメージ`_ を利用したWeb移植。
 
@@ -226,6 +226,4 @@ Apache License
 .. _Jester: https://github.com/dom96/jester
 
 .. |ci-test| image:: https://github.com/jiro4989/websh/workflows/test/badge.svg
-   :target: https://github.com/jiro4989/websh/actions
-.. |ci-release| image:: https://github.com/jiro4989/websh/workflows/release/badge.svg
    :target: https://github.com/jiro4989/websh/actions
