@@ -2,19 +2,6 @@ name: test
 
 on:
   push:
-  pull_request:
-    types:
-      - labeled
-      - unlabeled
-      - synchronize
-      - opened
-      - edited
-      - ready_for_review
-      - reopened
-      - unlocked
-  pull_request_review:
-    types:
-      - submitted
   release:
     types: [published]
 
@@ -56,10 +43,6 @@ jobs:
           name: application
           path: dist/websh.tar.gz
         if: startsWith(github.ref, 'refs/tags/')
-      - name: automerge
-        uses: "pascalgn/automerge-action@v0.7.2"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
   create-tag-draft:
     runs-on: ubuntu-latest
