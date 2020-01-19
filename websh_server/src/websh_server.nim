@@ -121,9 +121,7 @@ router myrouter:
 
       # 画像ファイルをbase64に変換
       var images: seq[ImageObj]
-      for kind, path in walkDir(imageDir):
-        if kind != pcFile:
-          continue
+      for path in walkFiles(imageDir / "*"):
         let (dir, name, ext) = splitFile(path)
         if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
           continue
