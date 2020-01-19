@@ -6,6 +6,11 @@ on:
     types: [published]
 
 jobs:
+  skip:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Skip job"
+
   before:
     runs-on: ubuntu-latest
     if: "! contains(github.event.head_commit.message, '[skip ci]')"
