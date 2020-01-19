@@ -77,8 +77,8 @@ API
 以下のツールがインストールされている必要があります。
 
 * Nim_
-* docker
-* docker-compose
+* Docker
+* Docker-compose
 
 ファイル・ディレクトリ構成
 --------------------------
