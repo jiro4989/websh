@@ -1,0 +1,15 @@
+name: lint
+
+on: [pull_request]
+
+jobs:
+  nimlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Nim lint
+        uses: jiro4989/nimlint-action@v1.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          src: 'websh_*/src/*.nim'
