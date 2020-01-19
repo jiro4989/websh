@@ -1,21 +1,27 @@
-name: build
+name: test
 
 on:
   push:
+    branches-ignore:
+      - 'master'
   pull_request:
-  release:
-    types: [published]
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
+  pull_request_review:
+    types:
+      - submitted
+  status: {}
 
 jobs:
-  before:
+  automerge:
     runs-on: ubuntu-latest
-    if: "! contains(github.event.head_commit.message, '[skip ci]')"
-    steps:
-      - run: echo "no [skip ci]"
-
-  build:
-    runs-on: ubuntu-latest
-    needs: before
     steps:
       - uses: actions/checkout@v1
       - name: Pull docker image
@@ -25,63 +31,10 @@ jobs:
       - name: Build server
         run: docker-compose -f docker-compose-ci.yml run server
       - name: Test API
-        run: |
-          pushd websh_server
-          WEBSH_DOCKER_IMAGE=jiro4989/websh ./bin/websh_server &
-          pid=$!
-          sleep 2
-          # 出力内容を確認する用
-          curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello"}' 'http://0.0.0.0:5000/shellgei'
-          # 標準出力のテスト
-          cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello"}' 'http://0.0.0.0:5000/shellgei' | grep hello | wc -l)
-          [ "$cnt" -eq 1 ]
-          # 標準エラー出力のテスト
-          cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello >&2"}' 'http://0.0.0.0:5000/shellgei' | grep hello | wc -l)
-          [ "$cnt" -eq 1 ]
-          kill $pid
-          popd
+        run: ./.github/scripts/api_test.sh
       - name: Build front
         run: docker-compose -f docker-compose-ci.yml run front
-      - name: Archive release files
-        run: |
-          mkdir -p dist/websh
-          cp -r websh_server/bin dist/websh
-          cp -r websh_front/public dist/websh
-          git describe --tags --abbrev=0 > dist/websh/tag.txt
-          pushd dist
-          tar czf websh.tar.gz websh
-          popd
-          ls -lah dist/websh.tar.gz
-      - name: Upload artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: application
-          path: dist/websh.tar.gz
-        if: startsWith(github.ref, 'refs/tags/')
-
-  create-tag-draft:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    needs: build
-    steps:
-      - uses: release-drafter/release-drafter@v5.3.1
+      - name: automerge
+        uses: "pascalgn/automerge-action@v0.7.2"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    needs: build
-    steps:
-      - name: Download artifact
-        uses: actions/download-artifact@v1
-        with:
-          name: application
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: application/websh.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy application
-        run: curl ${{ secrets.WEBHOOK_URL }}
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
