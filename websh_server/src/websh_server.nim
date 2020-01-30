@@ -75,9 +75,6 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
 router myrouter:
   post "/shellgei":
     try:
-      # TODO:
-      # uuidを使ってるけれど、どうせならシェル芸botと同じアルゴリズムでファ
-      # イルを生成したい
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
       info respJson
       # シェバンを付けないとshとして評価されるため一部の機能がつかえない模様(プロ
