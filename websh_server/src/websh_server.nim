@@ -93,10 +93,14 @@ router myrouter:
       let img = "images"
       let imageDir = getCurrentDir() / img / uuid
       defer:
+        info &"removes {shellScriptPath} script ..."
         removeFile(shellScriptPath)
-        info &"{shellScriptPath} was removed"
+
+        info &"removes {imageDir} directory ..."
         removeDir(imageDir)
-        info &"{imageDir} was removed"
+
+        info &"kills {uuid} docker container ..."
+        discard execCmd(&"docker kill {uuid}")
 
       # コマンドを実行するDockerイメージ名
       createDir(imageDir)
