@@ -112,7 +112,7 @@ router myrouter:
         "--name", uuid,
         "--log-driver=json-file",
         "--log-opt", "max-size=100m",
-        "--log-opt", "max-file=10",
+        "--log-opt", "max-file=3",
         "-v", &"{shellScriptPath}:{containerShellScriptPath}",
         "-v", &"{imageDir}:/{img}",
         # "-v", "./media:/media:ro",
