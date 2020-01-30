@@ -128,7 +128,7 @@ router myrouter:
       for path in walkFiles(imageDir / "*"):
         if not path.existsFile:
           continue
-        let (dir, name, ext) = splitFile(path)
+        let (_, _, ext) = splitFile(path)
         if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
           continue
         let content = readFile(path)
