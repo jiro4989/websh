@@ -17,13 +17,21 @@ const
 
 proc logging(level: string, msgs: varargs[string, `$`]) =
   ## **Note:** マルチスレッドだとloggingモジュールがうまく機能しないので仮で実装
-  var s: string
-  for msg in msgs:
-    s.add(msg)
-  let now = now()
-  let dt = now.format("yyyy-MM-dd")
-  let ti = now.format("HH:mm:ss")
-  echo &"{dt}T{ti}+0900 {level} {s}"
+  var kvs: seq[string]
+  for i in 0..<(msgs.len div 2):
+    let i = i * 2
+    let k = msgs[i]
+    var v = msgs[i+1]
+    if " " in v:
+      v = &"'{v}'"
+    kvs.add(&"{k}={v}")
+
+  let
+    now = now()
+    dt = now.format("yyyy-MM-dd")
+    ti = now.format("HH:mm:ss")
+    msg = kvs.join(" ")
+  echo &"{dt}T{ti}+0900 {level} {msg}"
 
 proc info(msgs: varargs[string, `$`]) =
   logging "INFO", msgs
@@ -56,11 +64,9 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
   elif exitCode == 137:
     status = statusTimeout
     msg = &"timeout: {timeout} second"
-    info &"exitCode={exitCode}, msg={msg}"
   else:
     status = statusSystemError
     msg = &"failed to run command: command={command}, args={args}"
-    error &"exitCode={exitCode}, msg={msg}"
 
   # 出力の取得
   block:
@@ -75,14 +81,14 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
 router myrouter:
   post "/shellgei":
     try:
+      let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
-      info respJson
+      info "uuid", uuid, "json", respJson
       # シェバンを付けないとshとして評価されるため一部の機能がつかえない模様(プロ
       # セス置換とか) (#7)
       if not respJson.code.startsWith("#!"):
         # シェバンがついてないときだけデフォルトbash
         respJson.code = "#!/bin/bash\n" & respJson.code
-      let uuid = $genUUID()
       let scriptName = &"{uuid}.sh"
       let shellScriptPath = getTempDir() / scriptName
       writeFile(shellScriptPath, respJson.code)
@@ -90,13 +96,13 @@ router myrouter:
       let img = "images"
       let imageDir = getCurrentDir() / img / uuid
       defer:
-        info &"removes {shellScriptPath} script ..."
+        info "uuid", uuid, "msg", &"removes {shellScriptPath} script ..."
         removeFile(shellScriptPath)
 
-        info &"removes {imageDir} directory ..."
+        info "uuid", uuid, "msg", &"removes {imageDir} directory ..."
         removeDir(imageDir)
 
-        info &"kills {uuid} docker container ..."
+        info "uuid", uuid, "msg", &"kills {uuid} docker container ..."
         discard execCmd(&"docker kill {uuid}")
 
       # コマンドを実行するDockerイメージ名
@@ -123,6 +129,13 @@ router myrouter:
       let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
       let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
 
+      case status
+      of statusOk: discard
+      of statusTimeout:
+        info "uuid", uuid, "msg", systemMsg
+      else:
+        error "uuid", uuid, "msg", systemMsg
+
       # 画像ファイルをbase64に変換
       var images: seq[ImageObj]
       for path in walkFiles(imageDir / "*"):
@@ -138,7 +151,7 @@ router myrouter:
       resp %*{"status":status, "system_message":systemMsg, "stdout":stdoutStr, "stderr":stderrStr, "images":images}
     except:
       let msg = getCurrentExceptionMsg()
-      error msg
+      error "msg", msg
       resp %*{"status":statusSystemError, "system_message":"System error occured.", "stdout":"", "stderr":"", "images":[]}
   get "/ping":
     resp %*{"status":"ok"}
