@@ -107,7 +107,7 @@ router myrouter:
 
       # コマンドを実行するDockerイメージ名
       createDir(imageDir)
-      let containerShellScriptPath = &"/tmp/{scriptName}"
+      let vScript = &"/tmp/{scriptName}"
       let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
       let args = [
         "run",
@@ -120,11 +120,11 @@ router myrouter:
         "--log-driver=json-file",
         "--log-opt", "max-size=100m",
         "--log-opt", "max-file=3",
-        "-v", &"{shellScriptPath}:{containerShellScriptPath}",
+        "-v", &"{shellScriptPath}:{vScript}:ro",
         "-v", &"{imageDir}:/{img}",
         # "-v", "./media:/media:ro",
         imageName,
-        "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+        "bash", "-c", &"sync && cp {vScript} {vScript}.1 && chmod +x {vScript}.1 && {vScript}.1 | stdbuf -o0 head -c 100K",
         ]
       let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
       let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
