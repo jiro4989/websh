@@ -94,6 +94,7 @@ router myrouter:
       writeFile(shellScriptPath, respJson.code)
 
       let img = "images"
+      let imageVolume = &"{img}_{uuid}"
       let imageDir = getCurrentDir() / img / uuid
       defer:
         info "uuid", uuid, "msg", &"removes {shellScriptPath} script ..."
@@ -105,8 +106,10 @@ router myrouter:
         info "uuid", uuid, "msg", &"kills {uuid} docker container ..."
         discard execCmd(&"docker kill {uuid}")
 
+        info "uuid", uuid, "msg", &"Remove {imageVolume} docker volume ..."
+        discard execCmd(&"docker volume rm -f {imageVolume}")
+
       # コマンドを実行するDockerイメージ名
-      createDir(imageDir)
       let vScript = &"/tmp/{scriptName}"
       let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
       let args = [
@@ -121,7 +124,7 @@ router myrouter:
         "--log-opt", "max-size=100m",
         "--log-opt", "max-file=3",
         "-v", &"{shellScriptPath}:{vScript}:ro",
-        "-v", &"{imageDir}:/{img}",
+        "-v", &"{imageVolume}:/{img}",
         # "-v", "./media:/media:ro",
         imageName,
         "bash", "-c", &"sync && cp {vScript} {vScript}.1 && chmod +x {vScript}.1 && {vScript}.1 | stdbuf -o0 head -c 100K",
@@ -135,6 +138,20 @@ router myrouter:
         info "uuid", uuid, "msg", systemMsg
       else:
         error "uuid", uuid, "msg", systemMsg
+
+      # 画像ディレクトリにファイルだけ移動
+      # 移動前に権限を操作しておく
+      createDir(imageDir)
+      let s = execProcess("docker", args=[
+        "run",
+        "--rm",
+        "-v", &"{imageVolume}:/src",
+        "-v", &"{imageDir}:/dst",
+        "bash",
+        "-c",
+        """chmod -R 0777 /src/ && ls -1d /src/* | while read -r f; do [[ -f "$f" ]] && mv "$f" /dst/; done """,
+        ], options={poUsePath})
+      info "uuid", uuid, "msg", s
 
       # 画像ファイルをbase64に変換
       var images: seq[ImageObj]
