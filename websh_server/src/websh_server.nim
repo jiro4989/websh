@@ -17,13 +17,21 @@ const
 
 proc logging(level: string, msgs: varargs[string, `$`]) =
   ## **Note:** マルチスレッドだとloggingモジュールがうまく機能しないので仮で実装
-  var s: string
-  for msg in msgs:
-    s.add(msg)
-  let now = now()
-  let dt = now.format("yyyy-MM-dd")
-  let ti = now.format("HH:mm:ss")
-  echo &"{dt}T{ti}+0900 {level} {s}"
+  var kvs: seq[string]
+  for i in 0..<(msgs.len div 2):
+    let i = i * 2
+    let k = msgs[i]
+    var v = msgs[i+1]
+    if " " in v:
+      v = &"'{v}'"
+    kvs.add(&"{k}={v}")
+
+  let
+    now = now()
+    dt = now.format("yyyy-MM-dd")
+    ti = now.format("HH:mm:ss")
+    msg = kvs.join(" ")
+  echo &"{dt}T{ti}+0900 {level} {msg}"
 
 proc info(msgs: varargs[string, `$`]) =
   logging "INFO", msgs
@@ -56,11 +64,9 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
   elif exitCode == 137:
     status = statusTimeout
     msg = &"timeout: {timeout} second"
-    info &"exitCode={exitCode}, msg={msg}"
   else:
     status = statusSystemError
     msg = &"failed to run command: command={command}, args={args}"
-    error &"exitCode={exitCode}, msg={msg}"
 
   # 出力の取得
   block:
@@ -75,32 +81,36 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
 router myrouter:
   post "/shellgei":
     try:
-      # TODO:
-      # uuidを使ってるけれど、どうせならシェル芸botと同じアルゴリズムでファ
-      # イルを生成したい
+      let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
-      info respJson
+      info "uuid", uuid, "json", respJson
       # シェバンを付けないとshとして評価されるため一部の機能がつかえない模様(プロ
       # セス置換とか) (#7)
       if not respJson.code.startsWith("#!"):
         # シェバンがついてないときだけデフォルトbash
         respJson.code = "#!/bin/bash\n" & respJson.code
-      let uuid = $genUUID()
       let scriptName = &"{uuid}.sh"
       let shellScriptPath = getTempDir() / scriptName
       writeFile(shellScriptPath, respJson.code)
 
       let img = "images"
+      let imageVolume = &"{img}_{uuid}"
       let imageDir = getCurrentDir() / img / uuid
       defer:
+        info "uuid", uuid, "msg", &"removes {shellScriptPath} script ..."
         removeFile(shellScriptPath)
-        info &"{shellScriptPath} was removed"
+
+        info "uuid", uuid, "msg", &"removes {imageDir} directory ..."
         removeDir(imageDir)
-        info &"{imageDir} was removed"
+
+        info "uuid", uuid, "msg", &"kills {uuid} docker container ..."
+        discard execCmd(&"docker kill {uuid}")
+
+        info "uuid", uuid, "msg", &"Remove {imageVolume} docker volume ..."
+        discard execCmd(&"docker volume rm -f {imageVolume}")
 
       # コマンドを実行するDockerイメージ名
-      createDir(imageDir)
-      let containerShellScriptPath = &"/tmp/{scriptName}"
+      let vScript = &"/tmp/{scriptName}"
       let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
       let args = [
         "run",
@@ -113,21 +123,42 @@ router myrouter:
         "--log-driver=json-file",
         "--log-opt", "max-size=100m",
         "--log-opt", "max-file=3",
-        "-v", &"{shellScriptPath}:{containerShellScriptPath}",
-        "-v", &"{imageDir}:/{img}",
+        "-v", &"{shellScriptPath}:{vScript}:ro",
+        "-v", &"{imageVolume}:/{img}",
         # "-v", "./media:/media:ro",
         imageName,
-        "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+        "bash", "-c", &"sync && cp {vScript} {vScript}.1 && chmod +x {vScript}.1 && {vScript}.1 | stdbuf -o0 head -c 100K",
         ]
       let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
       let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
+
+      case status
+      of statusOk: discard
+      of statusTimeout:
+        info "uuid", uuid, "msg", systemMsg
+      else:
+        error "uuid", uuid, "msg", systemMsg
+
+      # 画像ディレクトリにファイルだけ移動
+      # 移動前に権限を操作しておく
+      createDir(imageDir)
+      let s = execProcess("docker", args=[
+        "run",
+        "--rm",
+        "-v", &"{imageVolume}:/src",
+        "-v", &"{imageDir}:/dst",
+        "bash",
+        "-c",
+        """chmod -R 0777 /src/ && ls -1d /src/* | while read -r f; do [[ -f "$f" ]] && mv "$f" /dst/; done """,
+        ], options={poUsePath})
+      info "uuid", uuid, "msg", s
 
       # 画像ファイルをbase64に変換
       var images: seq[ImageObj]
       for path in walkFiles(imageDir / "*"):
         if not path.existsFile:
           continue
-        let (dir, name, ext) = splitFile(path)
+        let (_, _, ext) = splitFile(path)
         if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
           continue
         let content = readFile(path)
@@ -137,7 +168,7 @@ router myrouter:
       resp %*{"status":status, "system_message":systemMsg, "stdout":stdoutStr, "stderr":stderrStr, "images":images}
     except:
       let msg = getCurrentExceptionMsg()
-      error msg
+      error "msg", msg
       resp %*{"status":statusSystemError, "system_message":"System error occured.", "stdout":"", "stderr":"", "images":[]}
   get "/ping":
     resp %*{"status":"ok"}
