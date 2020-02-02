@@ -84,7 +84,11 @@ router myrouter:
     try:
       let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
+
+      # 処理開始の起点ログ
       info "uuid", uuid, "json", respJson
+
+      # コンテナ内で実行するスクリプトの生成
       let scriptName = &"{uuid}.sh"
       let shellScriptPath = getTempDir() / scriptName
       writeFile(shellScriptPath, respJson.code)
