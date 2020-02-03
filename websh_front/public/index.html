@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css">
 
   <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
   <style>
   textarea {
     font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
@@ -16,6 +15,17 @@
   }
   </style>
 
+  <script>
+    function encode(data, f) {
+      const blob = new Blob([data]);
+      const r = new FileReader();
+      r.onload = function () {
+        const data = r.result.substr(r.result.indexOf(',') + 1);
+        f(data);
+      };
+      r.readAsDataURL(blob);
+    }
+  </script>
 </head>
 
 <body id="body" class="grey darken-4">

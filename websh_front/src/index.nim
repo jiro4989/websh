@@ -2,7 +2,7 @@ from strutils import split
 from strformat import `&`
 from unicode import isAlpha, toRunes, runeAt, `==`, `$`
 from uri import encodeUrl
-from sequtils import mapIt, toSeq
+from sequtils import mapIt, toSeq, filterIt
 
 import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, jjson, kajax]
 
@@ -17,6 +17,8 @@ type
   ImageObj = object
     image: cstring
     filesize: cint
+  MediaObj = object
+    name, data: cstring
 
 const
   statusOk = cint(0)
@@ -33,8 +35,11 @@ else:
   # 本番用
   const apiUrl = "https://websh.jiro4989.com/api/shellgei"
 
+proc newMediaObj(): MediaObj = MediaObj(name: cstring"", data: cstring"")
+
 var
   inputShell = cstring""
+  inputImages = [newMediaObj(), newMediaObj(), newMediaObj(), newMediaObj()]
   outputStatus = cint(0)
   outputSystemMessage = cstring""
   outputStdout = cstring""
@@ -57,7 +62,8 @@ proc respCb(httpStatus: int, response: cstring) =
 
 proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示 ON
   isProgress = true
-  let body = %*{"code": inputShell}
+  let images = inputImages.filterIt(it.name != cstring"").mapIt(it.data)
+  let body = %*{"code": inputShell, "images": images}
   ajaxPost(apiUrl,
     headers = @[
       (cstring"mode", cstring"cors"),
@@ -85,6 +91,25 @@ proc countWord(s: string): int =
     else:
       # それ以外はマルチバイト文字のはず（たぶん）
       inc(result, 2)
+
+proc encode*(data: kdom.File, f: proc(data: cstring)) {.importc.}
+
+proc uploadFileButtonOnClicked(i: int): proc(ev: Event, n: VNode) =
+  let i = i
+  result = proc (ev: Event, n: VNode) =
+    let elem = cast[InputElement](ev.target)
+    if elem.files.len < 1: return
+    let file = cast[kdom.File](elem.files[0])
+    inputImages[i].name = file.name
+    let f = proc(data: cstring) =
+      inputImages[i].data = data
+    encode(file, f)
+
+proc deleteFileButtonOnClicked(i: int): proc(ev: Event, n: VNode) =
+  let i = i
+  result = proc (ev: Event, n: VNode) =
+    inputImages[i].name = cstring""
+    inputImages[i].data = cstring""
 
 proc createDom(): VNode =
   result = buildHtml(tdiv):
@@ -138,6 +163,21 @@ proc createDom(): VNode =
                            onkeydown = inputTextareaOnkeydown,
                            onkeyup = inputTextareaOnkeyup,
                            )
+                for ii in 0..<inputImages.len:
+                  tdiv(class="file has-name is-primary"):
+                    label(class="file-label"):
+                      input(class="file-input", accept="image/*", `type`="file", name="images", onchange=uploadFileButtonOnClicked(ii))
+                      span(class="file-cta"):
+                        span(class="file-label"):
+                          text "image file"
+                      span(class="file-name"):
+                        if inputImages[ii].name == cstring"":
+                          text "no file"
+                        else:
+                          text inputImages[ii].name
+                    if inputImages[ii].name != cstring"":
+                      button(class="button has-background-danger", onclick=deleteFileButtonOnClicked(ii)):
+                        text "Delete"
                 tdiv(class = "buttons"):
                   button(class="button is-primary", onclick = sendShellButtonOnClick):
                     text "Run (Ctrl + Enter)"
