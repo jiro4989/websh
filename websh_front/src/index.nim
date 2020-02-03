@@ -13,6 +13,7 @@ type
     stdout: cstring
     stderr: cstring
     images: seq[ImageObj]
+    elapsed_time: cstring
   ImageObj = object
     image: cstring
     filesize: cint
@@ -39,6 +40,7 @@ var
   outputStdout = cstring""
   outputStderr = cstring""
   outputImages: seq[ImageObj]
+  outputElapsedTime = cstring"0milsec"
   isProgress: bool
     ## シェルの実行中表示を切り替えるためのフラグ
 
@@ -49,6 +51,7 @@ proc respCb(httpStatus: int, response: cstring) =
   outputStdout = resp.stdout
   outputStderr = resp.stderr
   outputImages = resp.images
+  outputElapsedTime = resp.elapsed_time
   # シェルの実行中表示 OFF
   isProgress = false
 
@@ -102,9 +105,9 @@ proc createDom(): VNode =
             if isProgress:
               text "Running ..."
             elif outputStatus != statusOk:
-              text outputSystemMessage
+              text &"{outputSystemMessage} ({outputElapsedTime})"
             else:
-              text "none"
+              text &"none ({outputElapsedTime})"
 
     # 入力、出力スペース
     tdiv(class = "columns is-desktop"):
