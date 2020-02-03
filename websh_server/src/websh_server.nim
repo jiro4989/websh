@@ -81,6 +81,7 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
 router myrouter:
   post "/shellgei":
     try:
+      let now = now()
       let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
       info "uuid", uuid, "json", respJson
@@ -160,6 +161,8 @@ router myrouter:
         let img = ImageObj(image: base64.encode(content), filesize: content.len)
         images.add(img)
 
+      let elapsedTime = $(now() - now).inMilliseconds & "milsec"
+      info "uuid", uuid, "elapsedTime", elapsedTime, "msg", "complete"
       resp %*{"status":status, "system_message":systemMsg, "stdout":stdoutStr, "stderr":stderrStr, "images":images}
     except:
       let msg = getCurrentExceptionMsg()
