@@ -84,11 +84,6 @@ router myrouter:
       let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
       info "uuid", uuid, "json", respJson
-      # シェバンを付けないとshとして評価されるため一部の機能がつかえない模様(プロ
-      # セス置換とか) (#7)
-      if not respJson.code.startsWith("#!"):
-        # シェバンがついてないときだけデフォルトbash
-        respJson.code = "#!/bin/bash\n" & respJson.code
       let scriptName = &"{uuid}.sh"
       let shellScriptPath = getTempDir() / scriptName
       writeFile(shellScriptPath, respJson.code)
