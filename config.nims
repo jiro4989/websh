@@ -22,7 +22,7 @@ task buildServer, "websh_serverをビルドする":
 
 task runServer, "websh_serverを起動する":
   withDir serverDir:
-    exec "./bin/websh_server"
+    exec "WEBSH_REQUEST_TIMEOUT=10 ./bin/websh_server"
 
 task up, "Dockerコンテナを起動する":
   echo siteUrl
