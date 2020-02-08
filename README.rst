@@ -1,12 +1,20 @@
-|image-logo|
+==========================================
+websh - Web shellgei execution environment
+==========================================
 
-=====
-websh
-=====
+.. raw:: html
 
-|ci-test|
+   <h3 align="center">
+     <img src="https://github.com/jiro4989/websh/wiki/images/websh_logo.png" />
+   </h3>
+   <p align="center">
+     <a href="https://github.com/jiro4989/websh/releases/latest"><img src="https://img.shields.io/github/release/jiro4989/websh.svg" alt="Latest version" /></a>
+     <a href="https://github.com/jiro4989/websh/actions"><img src="https://github.com/jiro4989/websh/workflows/test/badge.svg" alt="Build Status" /></a>
+     <a href="LICENSE" alt="MIT License"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" /></a>
+   </p>
 
-`シェル芸botのDockerイメージ`_ を利用したWeb移植。
+| websh はWebブラウザ上でシェル芸botの実行環境を提供するWebアプリです。
+| シェル芸の実行はDockerコンテナ上で行っており、イメージに `シェル芸botのDockerイメージ`_ を使用しています。
 
 * https://websh.jiro4989.com/
 
@@ -211,7 +219,6 @@ Apache License
 .. _`websh_frontディレクトリ配下のREADME`: ./websh_front/README.rst
 .. _`websh_serverディレクトリ配下のREADME`: ./websh_server/README.rst
 
-.. |image-logo| image:: ./docs/websh_logo.png
 .. |image-top| image:: ./docs/top.png
 .. |image-local| image:: ./docs/local.svg
    :alt: ローカル環境の構成図
@@ -227,6 +234,3 @@ Apache License
 .. _Nim: https://nim-lang.org/
 .. _Karax: https://github.com/pragmagic/karax
 .. _Jester: https://github.com/dom96/jester
-
-.. |ci-test| image:: https://github.com/jiro4989/websh/workflows/test/badge.svg
-   :target: https://github.com/jiro4989/websh/actions
