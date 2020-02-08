@@ -155,8 +155,6 @@ router myrouter:
         if not path.existsFile:
           continue
         let (_, _, ext) = splitFile(path)
-        if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
-          continue
         let content = readFile(path)
         let img = ImageObj(image: base64.encode(content), filesize: content.len)
         images.add(img)
