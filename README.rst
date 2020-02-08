@@ -1,3 +1,5 @@
+|image-logo|
+
 =====
 websh
 =====
@@ -209,6 +211,7 @@ Apache License
 .. _`websh_frontディレクトリ配下のREADME`: ./websh_front/README.rst
 .. _`websh_serverディレクトリ配下のREADME`: ./websh_server/README.rst
 
+.. |image-logo| image:: ./docs/websh_logo.png
 .. |image-top| image:: ./docs/top.png
 .. |image-local| image:: ./docs/local.svg
    :alt: ローカル環境の構成図
