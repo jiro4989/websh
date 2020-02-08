@@ -6,6 +6,7 @@ import jester, uuids
 type
   ReqShellgeiJSON* = object
     code*: string
+    images*: seq[string]
   ImageObj* = object
     image*: string
     filesize*: int
@@ -84,20 +85,39 @@ router myrouter:
     try:
       let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
-      info "uuid", uuid, "json", respJson
+
+      # 処理開始の起点ログ
+      info "uuid", uuid, "code", respJson.code
+
+      # コンテナ内で実行するスクリプトの生成
       let scriptName = &"{uuid}.sh"
       let shellScriptPath = getTempDir() / scriptName
       writeFile(shellScriptPath, respJson.code)
 
-      let img = "images"
+      const img = "images"
+      const mda = "media"
       let imageVolume = &"{img}_{uuid}"
       let imageDir = getCurrentDir() / img / uuid
+      let mediaDir = getCurrentDir() / mda / uuid
+
+      # 入力の画像ファイルをディレクトリ配下に出力。
+      # 画像ファイルはbase64エンコードされたデータで渡されるので
+      # デコードしてから出力する。
+      createDir(mediaDir)
+      for i, encodedImage in respJson.images:
+        let data = base64.decode(encodedImage)
+        let file = mediaDir / $i
+        writeFile(file, data)
+
       defer:
         info "uuid", uuid, "msg", &"removes {shellScriptPath} script ..."
         removeFile(shellScriptPath)
 
         info "uuid", uuid, "msg", &"removes {imageDir} directory ..."
         removeDir(imageDir)
+
+        info "uuid", uuid, "msg", &"removes {mediaDir} directory ..."
+        removeDir(mediaDir)
 
         info "uuid", uuid, "msg", &"kills {uuid} docker container ..."
         discard execCmd(&"docker kill {uuid}")
@@ -121,7 +141,7 @@ router myrouter:
         "--log-opt", "max-file=3",
         "-v", &"{shellScriptPath}:{vScript}:ro",
         "-v", &"{imageVolume}:/{img}",
-        # "-v", "./media:/media:ro",
+        "-v", &"{mediaDir}:/{mda}:ro",
         imageName,
         "bash", "-c", &"sync && cp {vScript} {vScript}.1 && chmod +x {vScript}.1 && {vScript}.1 | stdbuf -o0 head -c 100K",
         ]
@@ -155,8 +175,6 @@ router myrouter:
         if not path.existsFile:
           continue
         let (_, _, ext) = splitFile(path)
-        if ext.toLowerAscii notin [".png", ".jpg", ".jpeg", ".gif"]:
-          continue
         let content = readFile(path)
         let img = ImageObj(image: base64.encode(content), filesize: content.len)
         images.add(img)
