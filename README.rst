@@ -76,7 +76,10 @@ API
 
 .. code-block:: shell
 
-   curl -X POST -d '{"code":"echo hello"}' 'https://websh.jiro4989.com/api/shellgei'
+   curl -X POST -d '{"code":"echo hello", "images":[]}' 'https://websh.jiro4989.com/api/shellgei'
+
+`images` にbase64エンコードした画像ファイルを含めるとwebsh上の `/media` 配下にア
+ップロードしたファイルがbase64デコードされて配置されます。
 
 開発
 ====
