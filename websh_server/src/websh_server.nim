@@ -77,6 +77,10 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
     var strm = p.errorStream
     stderrStr = strm.readStream()
 
+  # #143
+  # FIXME: https://github.com/nim-lang/Nim/pull/13399
+  stdoutStr = stdoutStr.replace($'\v', "\\u000b")
+  stderrStr = stderrStr.replace($'\v', "\\u000b")
   result = (stdoutStr, stderrStr, status, msg)
 
 router myrouter:
