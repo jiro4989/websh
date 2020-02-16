@@ -1,5 +1,6 @@
-import asyncdispatch, os, osproc, strutils, json, base64, times, streams
+import asyncdispatch, os, osproc, strutils, json, base64, times, streams, sequtils
 from strformat import `&`
+from algorithm import sorted
 
 import jester, uuids
 
@@ -15,6 +16,10 @@ const
   statusOk = 0
   statusTimeout = 1
   statusSystemError = 100
+  scriptName = "exec.sh"
+  containerPrefix = "shellgeibot"
+
+proc getTmpDir(): string = getCurrentDir() / "tmp"
 
 proc logging(level: string, msgs: varargs[string, `$`]) =
   ## **Note:** マルチスレッドだとloggingモジュールがうまく機能しないので仮で実装
@@ -79,6 +84,50 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
 
   result = (stdoutStr, stderrStr, status, msg)
 
+proc runCommandOnContainer(scriptDir, containerName: string): (string, string, int, string) =
+  let vScript = &"/tmp/script/{scriptName}"
+  let args = [
+    "exec",
+    "-i", containerName,
+    "bash", "-c", &"sync && cp {vScript} {vScript}.1 && chmod +x {vScript}.1 && {vScript}.1 | stdbuf -o0 head -c 100K",
+    ]
+  let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
+  result = runCommand("docker", args, timeout)
+
+proc getImages(dir: string): seq[ImageObj] =
+  ## 画像ディレクトリから画像ファイルを取得。
+  ## 取得の際はBase64エンコードした文字列として取得する。
+  for path in walkFiles(dir / "*"):
+    if not path.existsFile:
+      continue
+    let content = readFile(path)
+    let img = ImageObj(image: base64.encode(content), filesize: content.len)
+    result.add(img)
+
+proc fetchContainerName(count: int): string =
+  ## 一番起動時間の長いコンテナ名を返す
+  ##
+  ## TODO: コマンドラインで実行した結果をパースしていてとても気に入らないけれど
+  ## 、かと言ってAPIリクエストを調べるのも面倒なのでとりあえずはコレで...
+  let conts = toSeq(1..count).mapIt(&"{containerPrefix}_{it}")
+  var args = @["inspect", "-f", "{{.State.StartedAt}} {{.State.Status}} {{.Name}}"]
+  args = args.concat(conts)
+  let stdoutstr = execProcess("docker",
+              args = args,
+              options = {poUsePath})
+  result = stdoutstr.strip().split("\n").filterIt(" running " in it).sorted()[0].split(" ")[^1]
+  debugEcho &"fetchContainerName = {result}"
+
+proc createMediaFiles(dir: string, medias: seq[string]) =
+  ## 入力の画像ファイルをディレクトリ配下に出力。
+  ## 画像ファイルはbase64エンコードされたデータで渡されるので
+  ## デコードしてから出力する。
+  createDir(dir)
+  for i, encodedImage in medias:
+    let data = base64.decode(encodedImage)
+    let file = dir / $i
+    writeFile(file, data)
+
 router myrouter:
   post "/shellgei":
     let now = now()
@@ -86,68 +135,36 @@ router myrouter:
       let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
 
-      # 処理開始の起点ログ
+      # 一連の処理開始のログ
       info "uuid", uuid, "code", respJson.code
 
+      let
+        containersCount = getEnv("WEBSH_CONTAINERS_COUNT", "4").parseInt()
+        containerName = fetchContainerName(containersCount)
+        contDir = getTmpDir() / containerName
+        scriptDir = contDir / "script"
+        imageDir = contDir / "images"
+        mediaDir = contDir / "media"
+        lockDir = contDir / "lock"
+        rmflagDir = contDir / "removes"
+
+      # ロックファイルの生成
+      discard existsOrCreateDir(lockDir)
+      defer:
+        # 削除フラグファイルの作成
+        discard existsOrCreateDir(rmflagDir)
+
       # コンテナ内で実行するスクリプトの生成
-      let scriptName = &"{uuid}.sh"
-      let shellScriptPath = getTempDir() / scriptName
+      let shellScriptPath = scriptDir/scriptName
       writeFile(shellScriptPath, respJson.code)
 
-      const img = "images"
-      const mda = "media"
-      let imageVolume = &"{img}_{uuid}"
-      let imageDir = getCurrentDir() / img / uuid
-      let mediaDir = getCurrentDir() / mda / uuid
+      # Mediaの配置
+      createMediaFiles(mediaDir, respJson.images)
 
-      # 入力の画像ファイルをディレクトリ配下に出力。
-      # 画像ファイルはbase64エンコードされたデータで渡されるので
-      # デコードしてから出力する。
-      createDir(mediaDir)
-      for i, encodedImage in respJson.images:
-        let data = base64.decode(encodedImage)
-        let file = mediaDir / $i
-        writeFile(file, data)
+      # コンテナ上でシェルを実行
+      let (stdoutStr, stderrStr, status, systemMsg) = runCommandOnContainer(scriptDir, containerName)
 
-      defer:
-        info "uuid", uuid, "msg", &"removes {shellScriptPath} script ..."
-        removeFile(shellScriptPath)
-
-        info "uuid", uuid, "msg", &"removes {imageDir} directory ..."
-        removeDir(imageDir)
-
-        info "uuid", uuid, "msg", &"removes {mediaDir} directory ..."
-        removeDir(mediaDir)
-
-        info "uuid", uuid, "msg", &"kills {uuid} docker container ..."
-        discard execCmd(&"docker kill {uuid}")
-
-        info "uuid", uuid, "msg", &"Remove {imageVolume} docker volume ..."
-        discard execCmd(&"docker volume rm -f {imageVolume}")
-
-      # コマンドを実行するDockerイメージ名
-      let vScript = &"/tmp/{scriptName}"
-      let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
-      let args = [
-        "run",
-        "--rm",
-        "--net=none",
-        "-m", "256MB",
-        "--oom-kill-disable",
-        "--pids-limit", "1024",
-        "--name", uuid,
-        "--log-driver=json-file",
-        "--log-opt", "max-size=100m",
-        "--log-opt", "max-file=3",
-        "-v", &"{shellScriptPath}:{vScript}:ro",
-        "-v", &"{imageVolume}:/{img}",
-        "-v", &"{mediaDir}:/{mda}:ro",
-        imageName,
-        "bash", "-c", &"sync && cp {vScript} {vScript}.1 && chmod +x {vScript}.1 && {vScript}.1 | stdbuf -o0 head -c 100K",
-        ]
-      let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
-      let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
-
+      # TODO: ここ邪魔だなぁ
       case status
       of statusOk: discard
       of statusTimeout:
@@ -155,38 +172,32 @@ router myrouter:
       else:
         error "uuid", uuid, "msg", systemMsg
 
-      # 画像ディレクトリにファイルだけ移動
-      # 移動前に権限を操作しておく
-      createDir(imageDir)
-      let s = execProcess("docker", args=[
-        "run",
-        "--rm",
-        "-v", &"{imageVolume}:/src",
-        "-v", &"{imageDir}:/dst",
-        "bash",
-        "-c",
-        """chmod -R 0777 /src/ && ls -1d /src/* | while read -r f; do [[ -f "$f" ]] && mv "$f" /dst/; done """,
-        ], options={poUsePath})
-      info "uuid", uuid, "msg", s
-
-      # 画像ファイルをbase64に変換
-      var images: seq[ImageObj]
-      for path in walkFiles(imageDir / "*"):
-        if not path.existsFile:
-          continue
-        let (_, _, ext) = splitFile(path)
-        let content = readFile(path)
-        let img = ImageObj(image: base64.encode(content), filesize: content.len)
-        images.add(img)
+      let images = getImages(imageDir)
 
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
       info "uuid", uuid, "elapsedTime", elapsedTime, "msg", "complete"
-      resp %*{"status":status, "system_message":systemMsg, "stdout":stdoutStr, "stderr":stderrStr, "images":images, "elapsed_time":elapsedTime}
+
+      resp %*{
+        "status": status,
+        "system_message": systemMsg,
+        "stdout": stdoutStr,
+        "stderr": stderrStr,
+        "images": images,
+        "elapsed_time": elapsedTime,
+      }
     except:
       let msg = getCurrentExceptionMsg()
       error "msg", msg
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
-      resp %*{"status":statusSystemError, "system_message":"System error occured.", "stdout":"", "stderr":"", "images":[], "elapsed_time":elapsedTime}
+
+      resp %*{
+        "status": statusSystemError,
+        "system_message": "System error occured.",
+        "stdout": "",
+        "stderr": "",
+        "images": [],
+        "elapsed_time": elapsedTime,
+      }
   get "/ping":
     resp %*{"status":"ok"}
 
