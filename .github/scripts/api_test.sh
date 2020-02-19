@@ -26,6 +26,6 @@ cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello >&2", "images"
 
 kill $pid
 kill $remover_pid
-kill $visor
+kill $visor_pid
 
 popd

@@ -2,6 +2,7 @@ import asyncdispatch, os, osproc, strutils, json, base64, times, streams, sequti
 from strformat import `&`
 from algorithm import sorted
 
+# 外部ライブラリ
 import jester, uuids
 
 type
