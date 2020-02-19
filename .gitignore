@@ -7,3 +7,4 @@ websh_front/tests/*.js
 websh_server/tests/twebsh_server
 
 websh_server/bin/websh_remover
+websh_server/tools/visor
