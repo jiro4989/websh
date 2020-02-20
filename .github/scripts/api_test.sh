@@ -27,8 +27,4 @@ cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello", "images":[]}
 cnt=$(curl -s --connect-timeout 5 -X POST -d '{"code":"echo hello >&2", "images":[]}' 'http://0.0.0.0:5000/shellgei' | grep hello | wc -l)
 [ "$cnt" -eq 1 ]
 
-kill $pid
-kill $remover_pid
-kill $visor_pid
-
 popd
