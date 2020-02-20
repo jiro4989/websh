@@ -18,12 +18,22 @@ when isMainModule and not defined modeTest:
       # lockだけは一番最後に削除する必要がある
       for dir in walkDirs(containerDir/"*"):
         let (_, base, _) = splitFile(dir)
+        debugEcho "base = " & base
         if base == "lock": continue
-        let perm = dir.getFilePermissions()
         removeDir(dir)
         if base in ["images", "media", "script"]:
           createDir(dir)
-          dir.setFilePermissions(perm)
+          dir.setFilePermissions({
+            fpUserRead,
+            fpUserWrite,
+            fpUserExec,
+            fpGroupRead,
+            fpGroupWrite,
+            fpGroupExec,
+            fpOthersRead,
+            fpOthersWrite,
+            fpOthersExec,
+            })
       removeDir(containerDir/"lock")
 
     sleep(500) # ミリ秒
