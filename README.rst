@@ -66,6 +66,13 @@ URLレベルでのアクセスフローは以下。
 
 |access-flow|
 
+データ処理フロー
+================
+
+データ処理フローは以下。
+
+|image-proc-flow|
+
 API
 ====
 
@@ -227,6 +234,8 @@ Apache License
    :alt: ローカル環境の構成図
 .. |image-system| image:: ./docs/system.svg
    :alt: システム構成図
+.. |image-proc-flow| image:: ./docs/logic.svg
+   :alt: データ処理フロー
 .. |image-ci-flow| image:: ./docs/ci-main.svg
    :alt: CIフロー
 .. |image-release-flow| image:: ./docs/release_flow.svg
