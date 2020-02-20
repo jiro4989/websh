@@ -1,0 +1,51 @@
+@startuml
+
+actor User as user
+participant Browser as browser
+participant Supervisor as visor
+participant Nginx as nginx
+participant APIServer as api
+participant Container as cont
+participant Remover as rm
+participant LockFile as lock
+participant Images as img
+participant RemoveFlagFile as rmflag
+
+visor -> cont : コンテナ起動
+activate cont
+user -> browser : 画面表示
+user -> browser : シェル実行
+browser -> nginx : POSTリクエスト
+nginx -> api : POSTのプロキシ
+api -> lock : コンテナ使用中のロックファイルを生成
+activate lock
+api -> cont : シェルの実行(exec)
+cont -> img : 画像ファイルを生成
+activate img
+cont -> api : 実行結果の返却
+api -> rmflag : コンテナ削除フラグを作成
+activate rmflag
+api -> nginx : レスポンス
+nginx -> browser : レスポンス
+browser -> browser : 画面再描画
+browser -> user : 画面表示
+
+rm -> rmflag : フラグファイルの有無をチェック
+alt フラグファイルが存在するなら
+    rm -> cont : コンテナ破棄
+    deactivate cont
+    rm -> img : 画像ファイルを削除
+    deactivate img
+    rm -> rmflag : 削除フラグ削除
+    deactivate rmflag
+    rm -> lock : ロックファイル削除
+    deactivate lock
+end
+
+visor -> cont : プロセス死活監視
+alt コンテナプロセスが死んでいたら
+    visor -> cont : コンテナ起動
+    activate cont
+end
+
+@enduml

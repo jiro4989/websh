@@ -5,7 +5,7 @@ author        = "jiro4989"
 description   = "A new awesome nimble package"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["websh_server"]
+bin           = @["websh_server", "websh_remover"]
 binDir        = "bin"
 
 
