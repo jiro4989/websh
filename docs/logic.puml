@@ -2,24 +2,42 @@
 
 actor User as user
 participant Browser as browser
-participant Supervisor as visor
 participant Nginx as nginx
+participant HTMLFile as html
 participant APIServer as api
+participant Supervisor as visor
 participant Container as cont
 participant Remover as rm
 participant LockFile as lock
 participant Images as img
 participant RemoveFlagFile as rmflag
 
-visor -> cont : コンテナ起動
+activate visor
+
+visor -> rm : 起動
+activate rm
+
+visor -> cont : 起動
 activate cont
+
+visor -> api : 起動
+activate api
+
+visor -> nginx : 起動
+activate nginx
+
 user -> browser : 画面表示
+browser -> nginx : GET index.html
+nginx -> html : GET
+nginx -> browser : レスポンス
+browser -> user : 画面表示
+
 user -> browser : シェル実行
-browser -> nginx : POSTリクエスト
+browser -> nginx : POST /api/shellgei
 nginx -> api : POSTのプロキシ
 api -> lock : コンテナ使用中のロックファイルを生成
 activate lock
-api -> cont : シェルの実行(exec)
+api -> cont : シェルの実行
 cont -> img : 画像ファイルを生成
 activate img
 cont -> api : 実行結果の返却
