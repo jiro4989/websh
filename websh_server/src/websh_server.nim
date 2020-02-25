@@ -117,7 +117,6 @@ proc fetchContainerName(count: int): string =
               args = args,
               options = {poUsePath})
   result = stdoutstr.strip().split("\n").filterIt(" running " in it).sorted()[0].split(" ")[^1]
-  debugEcho &"fetchContainerName = {result}"
 
 proc createMediaFiles(dir: string, medias: seq[string]) =
   ## 入力の画像ファイルをディレクトリ配下に出力。
