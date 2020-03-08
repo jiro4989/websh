@@ -10,7 +10,7 @@ services:
       - "80:80"
     network_mode: "host"
 
-  shellgeibot_1:
+  shellgeibot_1: &base
     image: theoldmoon0602/shellgeibot
     container_name: shellgeibot_1
     volumes:
@@ -20,28 +20,25 @@ services:
     entrypoint: "tail -f /dev/null"
 
   shellgeibot_2:
-    image: theoldmoon0602/shellgeibot
+    <<: *base
     container_name: shellgeibot_2
     volumes:
       - "./websh_server/tmp/shellgeibot_2/images:/images"
       - "./websh_server/tmp/shellgeibot_2/media:/media"
       - "./websh_server/tmp/shellgeibot_2/script:/tmp/script"
-    entrypoint: "tail -f /dev/null"
 
   shellgeibot_3:
+    <<: *base
     container_name: shellgeibot_3
-    image: theoldmoon0602/shellgeibot
     volumes:
       - "./websh_server/tmp/shellgeibot_3/images:/images"
       - "./websh_server/tmp/shellgeibot_3/media:/media"
       - "./websh_server/tmp/shellgeibot_3/script:/tmp/script"
-    entrypoint: "tail -f /dev/null"
 
   shellgeibot_4:
-    image: theoldmoon0602/shellgeibot
+    <<: *base
     container_name: shellgeibot_4
     volumes:
       - "./websh_server/tmp/shellgeibot_4/images:/images"
       - "./websh_server/tmp/shellgeibot_4/media:/media"
       - "./websh_server/tmp/shellgeibot_4/script:/tmp/script"
-    entrypoint: "tail -f /dev/null"
