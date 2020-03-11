@@ -149,7 +149,17 @@ router myrouter:
         rmflagDir = contDir / "removes"
 
       # ロックファイルの生成
-      discard existsOrCreateDir(lockDir)
+      # trueが反るときはすでにディレクトリが存在する(ロック中)なので終了
+      if existsOrCreateDir(lockDir):
+        resp %*{
+          "status": statusSystemError,
+          "system_message": "System is busy. Please wait a second.",
+          "stdout": "",
+          "stderr": "",
+          "images": [],
+          "elapsed_time": "0milsec",
+        }
+
       defer:
         # 削除フラグファイルの作成
         discard existsOrCreateDir(rmflagDir)
