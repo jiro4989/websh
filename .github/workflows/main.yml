@@ -78,6 +78,8 @@ jobs:
           files: application/websh.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Deploy application
-        run: curl -X POST -H "Content-Type: application/json" -d '{"text":"sushi"}' ${{ secrets.DEPLOY_URL }}
-
+      - name: Deploy app
+        run: curl -X POST -H "${{ env.HEADER }}" -d '${{ env.BODY }}' ${{ secrets.DEPLOY_URL }}
+        env:
+          HEADER: "Content-Type: application/json"
+          BODY: '{"text": "sushi"}'
