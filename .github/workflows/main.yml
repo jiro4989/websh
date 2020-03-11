@@ -79,4 +79,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy application
-        run: curl ${{ secrets.WEBHOOK_URL }}
+        run: curl -X POST -H "Content-Type: application/json" -d '{"text":"sushi"}' ${{ secrets.DEPLOY_URL }}
+
