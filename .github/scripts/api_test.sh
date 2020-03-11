@@ -5,13 +5,13 @@ set -eux
 docker-compose -f docker-compose.yml -f docker-compose-ci-api.yml up -d
 sleep 5
 
+pushd websh_server
 ./bin/websh_remover &
 remover_pid=$!
 
 ./tools/visor &
 visor_pid=$!
 
-pushd websh_server
 ./bin/websh_server &
 pid=$!
 sleep 2
