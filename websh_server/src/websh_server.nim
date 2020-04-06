@@ -22,30 +22,6 @@ const
 
 proc getTmpDir(): string = getCurrentDir() / "tmp"
 
-proc logging(level: string, msgs: varargs[string, `$`]) =
-  ## **Note:** マルチスレッドだとloggingモジュールがうまく機能しないので仮で実装
-  var kvs: seq[string]
-  for i in 0..<(msgs.len div 2):
-    let i = i * 2
-    let k = msgs[i]
-    var v = msgs[i+1]
-    if " " in v:
-      v = &"'{v}'"
-    kvs.add(&"{k}={v}")
-
-  let
-    now = now()
-    dt = now.format("yyyy-MM-dd")
-    ti = now.format("HH:mm:ss")
-    msg = kvs.join(" ")
-  echo &"{dt}T{ti}+0900 {level} {msg}"
-
-proc info(msgs: varargs[string, `$`]) =
-  logging "INFO", msgs
-
-proc error(msgs: varargs[string, `$`]) =
-  logging "ERROR", msgs
-
 proc readStream(strm: var Stream): string =
   defer: strm.close()
   result = strm.readAll()
@@ -131,12 +107,12 @@ proc createMediaFiles(dir: string, medias: seq[string]) =
 router myrouter:
   post "/shellgei":
     let now = now()
+    let uuid = $genUUID()
     try:
-      let uuid = $genUUID()
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
 
       # 一連の処理開始のログ
-      info "uuid", uuid, "code", respJson.code
+      echo %*{"time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "begin"}
 
       let
         containersCount = getEnv("WEBSH_CONTAINERS_COUNT", "4").parseInt()
@@ -178,14 +154,14 @@ router myrouter:
       case status
       of statusOk: discard
       of statusTimeout:
-        info "uuid", uuid, "msg", systemMsg
+        echo %*{"time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
       else:
-        error "uuid", uuid, "msg", systemMsg
+        echo %*{"time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
 
       let images = getImages(imageDir)
 
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
-      info "uuid", uuid, "elapsedTime", elapsedTime, "msg", "complete"
+      echo %*{"time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "end"}
 
       resp %*{
         "status": status,
@@ -197,8 +173,8 @@ router myrouter:
       }
     except:
       let msg = getCurrentExceptionMsg()
-      error "msg", msg
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
+      echo %*{"time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
 
       resp %*{
         "status": statusSystemError,
@@ -212,10 +188,12 @@ router myrouter:
     resp %*{"status":"ok"}
 
 proc main =
+  echo %*{"time": $now(), "level": "info", "msg": "server begin", "nimVersion": NimVersion}
   var port = getEnv("WEBSH_PORT", "5000").parseInt().Port
   var settings = newSettings(port = port)
   var jester = initJester(myrouter, settings = settings)
   jester.serve()
+  echo %*{"time": $now(), "level": "info", "msg": "server end"}
 
 when isMainModule and not defined modeTest:
   main()
