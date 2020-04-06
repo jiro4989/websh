@@ -116,7 +116,7 @@ router myrouter:
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
 
       # 一連の処理開始のログ
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "begin"}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "request begin"}
 
       let
         containersCount = getEnv("WEBSH_CONTAINERS_COUNT", "4").parseInt()
@@ -165,7 +165,7 @@ router myrouter:
       let images = getImages(imageDir)
 
       let elapsedTime = (now() - now).inMilliseconds
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "end"}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "request end"}
 
       resp %*{
         "status": status,
