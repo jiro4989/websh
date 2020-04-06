@@ -106,13 +106,17 @@ proc createMediaFiles(dir: string, medias: seq[string]) =
 
 router myrouter:
   post "/shellgei":
-    let now = now()
-    let uuid = $genUUID()
+    const
+      xForHeader = "X-Forwarded-for"
+    let
+      now = now()
+      uuid = $genUUID()
+      xFor = request.headers().getOrDefault(xForHeader)
     try:
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
 
       # 一連の処理開始のログ
-      echo %*{"time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "begin"}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "begin"}
 
       let
         containersCount = getEnv("WEBSH_CONTAINERS_COUNT", "4").parseInt()
@@ -154,14 +158,14 @@ router myrouter:
       case status
       of statusOk: discard
       of statusTimeout:
-        echo %*{"time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
+        echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
       else:
-        echo %*{"time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
+        echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
 
       let images = getImages(imageDir)
 
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
-      echo %*{"time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "end"}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "end"}
 
       resp %*{
         "status": status,
@@ -174,7 +178,7 @@ router myrouter:
     except:
       let msg = getCurrentExceptionMsg()
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
-      echo %*{"time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
 
       resp %*{
         "status": statusSystemError,
