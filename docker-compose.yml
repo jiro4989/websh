@@ -1,12 +1,44 @@
-version: '3'
+version: '3.7'
 
 services:
-  proxy:
+  nginx:
     image: nginx:1.17
     volumes:
-      - "./proxy/conf.d:/etc/nginx/conf.d:ro"
+      - "./nginx/conf.d:/etc/nginx/conf.d:ro"
       - "./websh_front/public:/var/www:ro"
     ports:
       - "80:80"
     network_mode: "host"
 
+  websh_front:
+    build: &app-build
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    volumes:
+      - "./websh_front:/work"
+    entrypoint: nimble
+    command:
+      - build
+      - -Y
+      - -d:local
+
+  websh_server:
+    build: *app-build
+    volumes:
+      - "./websh_server:/work"
+    environment:
+      HOST_PWD: "$PWD/websh_server"
+    entrypoint: ./entrypoint.sh
+    ports:
+      - "5000:5000"
+    network_mode: "host"
+
+  websh_remover:
+    build: *app-build
+    volumes:
+      - "./websh_remover:/work"
+      - "./websh_server/tmp:/dirs"
+    entrypoint: ./entrypoint.sh
+    environment:
+      WEBSH_REMOVER_DIR: "/dirs"

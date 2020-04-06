@@ -22,7 +22,6 @@ const
 
 proc getTmpDir(): string = getCurrentDir() / "tmp"
 
-
 proc getImages(dir: string): seq[ImageObj] =
   ## 画像ディレクトリから画像ファイルを取得。
   ## 取得の際はBase64エンコードした文字列として取得する。
@@ -64,6 +63,10 @@ router myrouter:
         imageDir = contDir / "images"
         mediaDir = contDir / "media"
         removeFlag = contDir / "removes"
+        hostContDir = getEnv("HOST_PWD") / "tmp" / uuid
+        hostScriptDir = hostContDir / "script"
+        hostImageDir = hostContDir / "images"
+        hostMediaDir = hostContDir / "media"
 
       createDir(imageDir)
 
@@ -71,6 +74,7 @@ router myrouter:
       createDir(scriptDir)
       let shellScriptPath = scriptDir/scriptName
       writeFile(shellScriptPath, respJson.code)
+      let hostShellScriptPath = hostScriptDir/scriptName
 
       # Mediaの配置
       createMediaFiles(mediaDir, respJson.images)
@@ -88,9 +92,9 @@ router myrouter:
           name = uuid,
           image = image,
           cmds = cmds,
-          script = shellScriptPath,
-          mediaDir = mediaDir,
-          imageDir = imageDir)
+          script = hostShellScriptPath,
+          mediaDir = hostMediaDir,
+          imageDir = hostImageDir)
 
       # TODO: ここ邪魔だなぁ
       case status

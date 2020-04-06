@@ -1,10 +1,9 @@
-/bin/
+websh_server/bin/*
+websh_server/tests/twebsh_server
+websh_server/tmp/*
+!websh_server/tmp/.gitkeep
 
-websh_server/bin/websh_server
 websh_front/public/js/index.js
 websh_front/tests/*.js
 
-websh_server/tests/twebsh_server
-
-websh_server/bin/websh_remover
-websh_server/tools/visor
+websh_remover/bin/*

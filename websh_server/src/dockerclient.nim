@@ -20,7 +20,7 @@ type
 proc newClient*(): DockerClient =
   let
     client = newHttpClient(timeout = 10 * 1000)
-    url = "http://localhost:2376"
+    url = "http://127.0.1.1:2376" # ホストのDockerAPI
   return DockerClient(client: client, url: url)
 
 proc createContainer*(self: DockerClient, name: string, image: string, cmds: seq[string], script = "", mediaDir = "", imageDir = ""): Response =
