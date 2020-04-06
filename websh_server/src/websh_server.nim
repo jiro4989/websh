@@ -164,7 +164,7 @@ router myrouter:
 
       let images = getImages(imageDir)
 
-      let elapsedTime = $(now() - now).inMilliseconds & "milsec"
+      let elapsedTime = (now() - now).inMilliseconds
       echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "end"}
 
       resp %*{
@@ -173,7 +173,7 @@ router myrouter:
         "stdout": stdoutStr,
         "stderr": stderrStr,
         "images": images,
-        "elapsed_time": elapsedTime,
+        "elapsed_time": $elapsedTime & "milsec",
       }
     except:
       let msg = getCurrentExceptionMsg()
