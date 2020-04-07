@@ -107,11 +107,12 @@ proc createMediaFiles(dir: string, medias: seq[string]) =
 router myrouter:
   post "/shellgei":
     const
-      xForHeader = "X-Forwarded-for"
+      # #158 JSONのキーにハイフンを含めるべきでないのでlowerCamelCaseにする
+      xForHeader = "xForwardedFor"
     let
       now = now()
       uuid = $genUUID()
-      xFor = request.headers().getOrDefault(xForHeader)
+      xFor = request.headers().getOrDefault("X-Forwarded-for")
     try:
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
 
