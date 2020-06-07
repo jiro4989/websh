@@ -29,8 +29,13 @@ jobs:
       - uses: actions/checkout@v1
       - name: Pull docker image
         run: docker pull jiro4989/websh:latest
+      - uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: devel
       - name: Test server
-        run: docker-compose -f docker-compose-ci.yml run server test -Y
+        run: |
+          pushd websh_server
+          nimble test -Y
       - name: Build server
         run: docker-compose -f docker-compose-ci.yml run server
       - name: Test API
