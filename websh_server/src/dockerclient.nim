@@ -111,4 +111,6 @@ proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[st
     return ("", "", statusSystemError, &"failed to call 'getStderrLog': cmds={cmds} resp.body={resp.body}")
   stderrStr = resp.body.parseLog
 
+  discard self.killContainer(name = name)
+
   return (stdoutStr, stderrStr, statusOk, "")
