@@ -1,4 +1,4 @@
-import httpclient, json, strformat, streams
+import httpclient, json, strformat, streams, endians
 from strutils import join
 
 import status
@@ -71,9 +71,13 @@ proc parseLog(s: string): string =
     discard strm.readUint8()
     discard strm.readUint8()
 
-    let n = strm.readUint32().int
+    # Bigendianで読み取る
+    var src = strm.readUint32().int
+    var n: int
+    bigEndian32(addr(n), addr(src))
+
     lines.add(strm.readStr(n))
-  result = lines.join("\n")
+  result = lines.join
 
 proc getLog(self: DockerClient, name: string, stdout = false, stderr = false): Response =
   let url = &"{self.url}/containers/{name}/logs?stdout={stdout}&stderr={stderr}&follow=true"
