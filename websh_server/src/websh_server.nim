@@ -63,6 +63,7 @@ router myrouter:
         scriptDir = contDir / "script"
         imageDir = contDir / "images"
         mediaDir = contDir / "media"
+        removeFlag = confDir / "removes"
 
       createDir(imageDir)
 
@@ -100,6 +101,9 @@ router myrouter:
         echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
 
       let images = getImages(imageDir)
+
+      # 削除フラグをたてる
+      createDir(removeFlag)
 
       let elapsedTime = (now() - now).inMilliseconds
       echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "request end"}
