@@ -64,7 +64,10 @@ router myrouter:
         imageDir = contDir / "images"
         mediaDir = contDir / "media"
 
+      createDir(imageDir)
+
       # コンテナ内で実行するスクリプトの生成
+      createDir(scriptDir)
       let shellScriptPath = scriptDir/scriptName
       writeFile(shellScriptPath, respJson.code)
 
