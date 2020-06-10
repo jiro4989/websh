@@ -63,7 +63,7 @@ router myrouter:
         scriptDir = contDir / "script"
         imageDir = contDir / "images"
         mediaDir = contDir / "media"
-        removeFlag = confDir / "removes"
+        removeFlag = contDir / "removes"
 
       createDir(imageDir)
 
