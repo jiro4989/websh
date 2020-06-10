@@ -1,11 +1,11 @@
-import httpclient, json, strformat, streams, endians
+import httpclient, json, strformat, streams, endians, asyncfutures, asyncdispatch
 from strutils import join
 
 import status
 
 type
   DockerClient = ref object
-    client: HttpClient
+    client: AsyncHttpClient
     url: string
   Mount = object
     Target, Source, Type: string
@@ -19,11 +19,11 @@ type
 
 proc newClient*(): DockerClient =
   let
-    client = newHttpClient(timeout = 10 * 1000)
+    client = newAsyncHttpClient()
     url = "http://localhost:2376"
   return DockerClient(client: client, url: url)
 
-proc createContainer*(self: DockerClient, name: string, image: string, cmds: seq[string], script = "", mediaDir = "", imageDir = ""): Response =
+proc createContainer*(self: DockerClient, name: string, image: string, cmds: seq[string], script = "", mediaDir = "", imageDir = ""): Future[AsyncResponse] =
   var self = self
   self.client.headers = newHttpHeaders({ "Content-Type": "application/json" })
   let url = &"{self.url}/containers/create?name={name}"
@@ -55,18 +55,18 @@ proc createContainer*(self: DockerClient, name: string, image: string, cmds: seq
 
   self.client.post(url = url, body = $body)
 
-proc startContainer*(self: DockerClient, name: string): Response =
+proc startContainer*(self: DockerClient, name: string): Future[AsyncResponse] =
   var self = self
   self.client.headers = newHttpHeaders({ "Content-Type": "application/json" })
   let url = &"{self.url}/containers/{name}/start"
   self.client.post(url = url)
 
-proc killContainer*(self: DockerClient, name: string): Response =
+proc killContainer*(self: DockerClient, name: string): Future[AsyncResponse] =
   var self = self
   let url = &"{self.url}/containers/{name}/kill"
   self.client.post(url = url)
 
-proc removeContainer*(self: DockerClient, name: string): Response =
+proc removeContainer*(self: DockerClient, name: string): Future[AsyncResponse] =
   var self = self
   let url = &"{self.url}/containers/{name}?v=true&force=true"
   self.client.delete(url = url)
@@ -93,37 +93,66 @@ proc parseLog(s: string): string =
     lines.add(strm.readStr(n))
   result = lines.join
 
-proc getLog(self: DockerClient, name: string, stdout = false, stderr = false): Response =
+proc getLog(self: DockerClient, name: string, stdout = false, stderr = false): Future[AsyncResponse] =
   let url = &"{self.url}/containers/{name}/logs?stdout={stdout}&stderr={stderr}&follow=true"
   self.client.get(url = url)
 
-proc getStdoutLog*(self: DockerClient, name: string): Response =
+proc getStdoutLog*(self: DockerClient, name: string): Future[AsyncResponse] =
   self.getLog(name = name, stdout = true, stderr = false)
 
-proc getStderrLog*(self: DockerClient, name: string): Response =
+proc getStderrLog*(self: DockerClient, name: string): Future[AsyncResponse] =
   self.getLog(name = name, stdout = false, stderr = true)
 
-proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[string], script = "", mediaDir = "", imageDir = ""): (string, string, int, string) =
-  var resp: Response
-  resp = self.createContainer(name = name, image = image, cmds = cmds, script = script, mediaDir = mediaDir, imageDir = imageDir)
-  if not resp.code.is2xx:
-    return ("", "", statusSystemError, &"failed to call 'createContainer': cmds={cmds} resp.body={resp.body}")
+proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[string], script = "", mediaDir = "", imageDir = ""): Future[(string, string, int, string)] {.async.} =
+  var fresp: Future[AsyncResponse]
+  const timeoutSec = 10 * 1000
 
-  resp = self.startContainer(name = name)
-  if not resp.code.is2xx:
-    return ("", "", statusSystemError, &"failed to call 'startContainer': cmds={cmds} resp.body={resp.body}")
+  fresp = self.createContainer(name = name, image = image, cmds = cmds, script = script, mediaDir = mediaDir, imageDir = imageDir)
+  var hasCompleted = await withTimeout(fresp, timeoutSec)
+  if hasCompleted:
+    let resp = await fresp
+    if not resp.code.is2xx:
+      let body = await resp.body
+      return ("", "", statusSystemError, &"failed to call 'createContainer': cmds={cmds} resp.body={body}")
+  else:
+    return ("", "", statusSystemError, &"'createContainer' timeout 10 sec: cmds={cmds}")
 
+  echo "start"
+  fresp = self.startContainer(name = name)
+  hasCompleted = await withTimeout(fresp, timeoutSec)
+  if hasCompleted:
+    let resp = await fresp
+    if not resp.code.is2xx:
+      let body = await resp.body
+      return ("", "", statusSystemError, &"failed to call 'startContainer': cmds={cmds} resp.body={body}")
+  else:
+    return ("", "", statusSystemError, &"'startContainer' timeout 10 sec: cmds={cmds}")
+
+  echo "stdout"
   var stdoutStr: string
-  resp = self.getStdoutLog(name = name)
-  if not resp.code.is2xx:
-    return ("", "", statusSystemError, &"failed to call 'getStdoutLog': cmds={cmds} resp.body={resp.body}")
-  stdoutStr = resp.body.parseLog
+  fresp = self.getStdoutLog(name = name)
+  hasCompleted = await withTimeout(fresp, timeoutSec)
+  if hasCompleted:
+    let resp = await fresp
+    let body = await resp.body
+    if not resp.code.is2xx:
+      return ("", "", statusSystemError, &"failed to call 'getStdoutLog': cmds={cmds} resp.body={body}")
+    stdoutStr = body.parseLog
+  else:
+    return ("", "", statusSystemError, &"'getStdoutLog' timeout 10 sec: cmds={cmds}")
 
+  echo "stderr"
   var stderrStr: string
-  resp = self.getStderrLog(name = name)
-  if not resp.code.is2xx:
-    return ("", "", statusSystemError, &"failed to call 'getStderrLog': cmds={cmds} resp.body={resp.body}")
-  stderrStr = resp.body.parseLog
+  fresp = self.getStderrLog(name = name)
+  hasCompleted = await withTimeout(fresp, timeoutSec)
+  if hasCompleted:
+    let resp = await fresp
+    let body = await resp.body
+    if not resp.code.is2xx:
+      return ("", "", statusSystemError, &"failed to call 'getStderrLog': cmds={cmds} resp.body={body}")
+    stderrStr = body.parseLog
+  else:
+    return ("", "", statusSystemError, &"'getStderrLog' timeout 10 sec: cmds={cmds}")
 
   discard self.killContainer(name = name)
 
