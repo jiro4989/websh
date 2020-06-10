@@ -10,10 +10,16 @@ type
   Mount = object
     Target, Source, Type: string
     ReadOnly: bool
+  HostConfig = object
+    Memory: int64
+    OomKillDisable: bool
+    PidsLimit: int64
+    Mounts: seq[Mount]
+    NetworkMode: string
 
 proc newClient*(): DockerClient =
   let
-    client = newHttpClient()
+    client = newHttpClient(timeout = 10 * 1000)
     url = "http://localhost:2376"
   return DockerClient(client: client, url: url)
 
@@ -28,6 +34,12 @@ proc createContainer*(self: DockerClient, name: string, image: string, cmds: seq
     "Tty": false,
   }
 
+  var hostconf = HostConfig(
+      Memory: 256 * 1024 * 1024, # 256MB
+      OomKillDisable: true,
+      PidsLimit: 1024,
+      NetworkMode: "none",
+  )
   var mounts: seq[Mount]
   if script != "":
     mounts.add(Mount(Target: "/tmp/exec.sh", Source: script, Type: "bind", ReadOnly: true))
@@ -37,7 +49,9 @@ proc createContainer*(self: DockerClient, name: string, image: string, cmds: seq
     mounts.add(Mount(Target: "/images", Source: imageDir, Type: "bind", ReadOnly: false))
 
   if 1 <= mounts.len:
-    body["Mounts"] = % mounts
+    hostconf.Mounts = mounts
+
+  body["HostConfig"] = % hostconf
 
   self.client.post(url = url, body = $body)
 
