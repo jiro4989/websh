@@ -84,7 +84,7 @@ router myrouter:
         ]
       var client = newClient()
       let (stdoutStr, stderrStr, status, systemMsg) =
-        await client.runContainer(
+        client.runContainer(
           name = uuid,
           image = image,
           cmds = cmds,
