@@ -35,6 +35,7 @@ jobs:
       - name: Test server
         run: |
           pushd websh_server
+          echo -e '\nswitch("d", "ci")' > tests/config.nims
           nimble test -Y
       - name: Build server
         run: docker-compose -f docker-compose-ci.yml run server
