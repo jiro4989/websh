@@ -1,4 +1,4 @@
-import httpclient, json, strformat, streams, endians
+import httpclient, os, json, strformat, streams, endians
 from strutils import join
 
 import status
@@ -71,6 +71,11 @@ proc removeContainer*(self: DockerClient, name: string): Response =
   let url = &"{self.url}/containers/{name}?v=true&force=true"
   self.client.delete(url = url)
 
+proc inspectContainer*(self: DockerClient, name: string): Response =
+  var self = self
+  let url = &"{self.url}/containers/{name}/json"
+  self.client.get(url = url)
+
 proc parseLog(s: string): string =
   var strm = newStringStream(s)
   defer: strm.close
@@ -94,7 +99,7 @@ proc parseLog(s: string): string =
   result = lines.join
 
 proc getLog(self: DockerClient, name: string, stdout = false, stderr = false): Response =
-  let url = &"{self.url}/containers/{name}/logs?stdout={stdout}&stderr={stderr}&follow=true"
+  let url = &"{self.url}/containers/{name}/logs?stdout={stdout}&stderr={stderr}&follow=false"
   self.client.get(url = url)
 
 proc getStdoutLog*(self: DockerClient, name: string): Response =
@@ -102,6 +107,22 @@ proc getStdoutLog*(self: DockerClient, name: string): Response =
 
 proc getStderrLog*(self: DockerClient, name: string): Response =
   self.getLog(name = name, stdout = false, stderr = true)
+
+proc waitFinish(self: DockerClient, name: string) =
+  const timeout = 10000
+  const unit = 250
+  var elapsed: int
+  while true:
+    let resp = self.inspectContainer(name = name)
+    if not resp.code.is2xx:
+      return
+    let running = resp.body.parseJson["State"]["Running"].getBool
+    echo running
+    if not running: break
+
+    sleep unit
+    elapsed += unit
+    if timeout <= elapsed: break
 
 proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[string], script = "", mediaDir = "", imageDir = ""): (string, string, int, string) =
   var resp: Response
@@ -112,6 +133,8 @@ proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[st
   resp = self.startContainer(name = name)
   if not resp.code.is2xx:
     return ("", "", statusSystemError, &"failed to call 'startContainer': cmds={cmds} resp.body={resp.body}")
+
+  self.waitFinish(name = name)
 
   var stdoutStr: string
   resp = self.getStdoutLog(name = name)
@@ -126,5 +149,6 @@ proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[st
   stderrStr = resp.body.parseLog
 
   discard self.killContainer(name = name)
+  discard self.removeContainer(name = name)
 
   return (stdoutStr, stderrStr, statusOk, "")
