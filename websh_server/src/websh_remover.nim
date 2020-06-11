@@ -13,28 +13,7 @@ when isMainModule and not defined modeTest:
       let rmflagDir = containerDir/"removes"
       if not existsDir(rmflagDir): continue
 
-      let (_, containerName, _) = containerDir.splitFile()
-      discard execShellCmd(&"docker kill {containerName}")
-
-      # lockだけは一番最後に削除する必要がある
-      for dir in walkDirs(containerDir/"*"):
-        let (_, base, _) = splitFile(dir)
-        echo %*{"time": $now(), "level": "info", "msg": "remove " & base}
-        if base == "lock": continue
-        removeDir(dir)
-        if base in ["images", "media", "script"]:
-          createDir(dir)
-          dir.setFilePermissions({
-            fpUserRead,
-            fpUserWrite,
-            fpUserExec,
-            fpGroupRead,
-            fpGroupWrite,
-            fpGroupExec,
-            fpOthersRead,
-            fpOthersWrite,
-            fpOthersExec,
-            })
-      removeDir(containerDir/"lock")
+      removeDir(containerDir)
+      echo %*{"time": $now(), "level": "info", "msg": &"{containerDir} was removed"}
 
     sleep(500) # ミリ秒

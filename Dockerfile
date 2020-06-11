@@ -11,4 +11,4 @@ RUN apt-get update -yqq \
 ENV PATH /root/.nimble/bin:$PATH
 RUN curl https://nim-lang.org/choosenim/init.sh -sSf > init.sh
 RUN sh init.sh -y \
-    && choosenim update stable
+    && choosenim update devel
