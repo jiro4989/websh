@@ -110,14 +110,13 @@ proc getStderrLog*(self: DockerClient, name: string): Response =
 
 proc waitFinish(self: DockerClient, name: string) =
   const timeout = 10000
-  const unit = 250
+  const unit = 200
   var elapsed: int
   while true:
     let resp = self.inspectContainer(name = name)
     if not resp.code.is2xx:
       return
     let running = resp.body.parseJson["State"]["Running"].getBool
-    echo running
     if not running: break
 
     sleep unit
