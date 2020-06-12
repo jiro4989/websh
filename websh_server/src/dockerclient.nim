@@ -128,26 +128,27 @@ proc runContainer*(self: DockerClient, name: string, image: string, cmds: seq[st
   resp = self.createContainer(name = name, image = image, cmds = cmds, script = script, mediaDir = mediaDir, imageDir = imageDir)
   if not resp.code.is2xx:
     return ("", "", statusSystemError, &"failed to call 'createContainer': cmds={cmds} resp.body={resp.body}")
+  let id = resp.body.parseJson["Id"].getStr
 
-  resp = self.startContainer(name = name)
+  resp = self.startContainer(name = id)
   if not resp.code.is2xx:
     return ("", "", statusSystemError, &"failed to call 'startContainer': cmds={cmds} resp.body={resp.body}")
 
-  self.waitFinish(name = name)
+  self.waitFinish(name = id)
 
   var stdoutStr: string
-  resp = self.getStdoutLog(name = name)
+  resp = self.getStdoutLog(name = id)
   if not resp.code.is2xx:
     return ("", "", statusSystemError, &"failed to call 'getStdoutLog': cmds={cmds} resp.body={resp.body}")
   stdoutStr = resp.body.parseLog
 
   var stderrStr: string
-  resp = self.getStderrLog(name = name)
+  resp = self.getStderrLog(name = id)
   if not resp.code.is2xx:
     return ("", "", statusSystemError, &"failed to call 'getStderrLog': cmds={cmds} resp.body={resp.body}")
   stderrStr = resp.body.parseLog
 
-  discard self.killContainer(name = name)
-  discard self.removeContainer(name = name)
+  discard self.killContainer(name = id)
+  discard self.removeContainer(name = id)
 
   return (stdoutStr, stderrStr, statusOk, "")
