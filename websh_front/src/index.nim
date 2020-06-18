@@ -181,7 +181,7 @@ proc createDom(): VNode =
                 tdiv(class = "buttons"):
                   button(class="button is-primary", onclick = sendShellButtonOnClick):
                     text "Run (Ctrl + Enter)"
-                  a(href = &"""https://twitter.com/intent/tweet?button_hashtag=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
+                  a(href = &"""https://twitter.com/intent/tweet?hashtags=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
                       class = "button twitter-share-button is-link",
                       `data-show-count` = "false"):
                     text "Tweet"
