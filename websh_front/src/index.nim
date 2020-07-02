@@ -48,6 +48,7 @@ var
   outputElapsedTime = cstring"0milsec"
   isProgress: bool
     ## シェルの実行中表示を切り替えるためのフラグ
+  hashTag = cstring"シェル芸"
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
@@ -181,10 +182,17 @@ proc createDom(): VNode =
                 tdiv(class = "buttons"):
                   button(class="button is-primary", onclick = sendShellButtonOnClick):
                     text "Run (Ctrl + Enter)"
-                  a(href = &"""https://twitter.com/intent/tweet?hashtags=シェル芸&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
+                  a(href = &"""https://twitter.com/intent/tweet?hashtags={encodeUrl($hashTag, false)}&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
                       class = "button twitter-share-button is-link",
                       `data-show-count` = "false"):
                     text "Tweet"
+                  tdiv(class = "select"):
+                    select:
+                      proc onchange(ev: Event, n: VNode) =
+                        hashTag = $n.value
+                      for elem in @[cstring"シェル芸", cstring"shellgei", cstring"ゆるシェル", cstring"危険シェル芸", ]:
+                        option(value = $elem):
+                          text $elem
       tdiv(class = "column"):
         tdiv(class = "tile is-ancestor"):
           tdiv(class = "tile is-parent is-vertical"):
