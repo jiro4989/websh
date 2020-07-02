@@ -2,7 +2,7 @@
 
 set -eux
 
-docker-compose -f docker-compose.yml -f docker-compose-ci-api.yml up -d
+docker-compose up -d
 sleep 5
 
 pushd websh_server
