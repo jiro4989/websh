@@ -51,6 +51,9 @@ jobs:
       - name: Build image (remover runtime)
         run: docker build --target websh_remover_runtime -t ${{ env.registory }}/remover:${{ env.image-tag }} .
 
+      - name: Login docker
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
       - name: Push image to registory
         run: |
           docker push ${{ env.registory }}/server:${{ env.image-tag }}
