@@ -89,10 +89,6 @@ Infrastructure as Codeしている。
 
 |image-system|
 
-URLレベルでのアクセスフローは以下。
-
-|access-flow|
-
 基本設計
 ================
 
@@ -263,8 +259,6 @@ Apache License
    :alt: CIフロー
 .. |image-release-flow| image:: ./docs/release_flow.svg
    :alt: リリースフロー
-.. |access-flow| image:: ./docs/access_flow.svg
-   :alt: アクセスフロー
 
 .. _Nim: https://nim-lang.org/
 .. _Karax: https://github.com/pragmagic/karax
