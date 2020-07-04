@@ -86,6 +86,13 @@ nginxはコンテナ内からホストPCのwebsh_serverにリバースプロキ�
 Infrastructure as Code (Ansible) している。
 ソースコードは infra_ リポジトリ（非公開）で管理。
 
+監視系はローカルPCのDockerコンテナ上で動作するGrafanaとPrometheusで実施。
+`nimbot <https://github.com/jiro4989/nimbot/>`_ はSlack用のBotで、
+websh用のサーバに後乗せで一緒に稼働している。
+
+ログは一旦ローカルに書き出したファイルをFluentdが拾ってJSON形式に変換して保存。
+GrafanaLokiがログを拾って、Grafanaからログを取得してログ監視をしている。
+
 |image-system|
 
 基本設計
