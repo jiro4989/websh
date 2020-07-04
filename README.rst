@@ -83,9 +83,8 @@ nginxはコンテナ内からホストPCのwebsh_serverにリバースプロキ�
 本番環境
 ---------
 
-Infrastructure as Codeしている。
+Infrastructure as Code (Ansible) している。
 ソースコードは infra_ リポジトリ（非公開）で管理。
-以下はアプリレベルでの構成図。
 
 |image-system|
 
@@ -251,7 +250,7 @@ Apache License
 .. |image-top| image:: ./docs/top.png
 .. |image-local| image:: ./docs/local.svg
    :alt: ローカル環境の構成図
-.. |image-system| image:: ./docs/system.svg
+.. |image-system| image:: ./docs/system.png
    :alt: システム構成図
 .. |image-proc-flow| image:: ./docs/logic.svg
    :alt: データ処理フロー
