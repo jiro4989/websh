@@ -151,6 +151,8 @@ docker-compose.yml      ローカル開発でのみ使用する開発環境設�
 
 .. code-block:: shell
 
+   # シェル芸botのイメージを取得 (巨大なので注意)
+   docker pull theoldmoon0602/shellgeibot
    docker-compose build
    docker-compose up
 
