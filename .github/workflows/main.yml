@@ -12,7 +12,6 @@ on:
 
 env:
   registory: 'jiro4989/websh'
-  image-tag: 'latest'
 
 jobs:
   skip:
@@ -46,18 +45,27 @@ jobs:
         run: docker run --rm -v $PWD/websh_server:/work -t base nimble test -Y
 
       - name: Build image (server runtime)
-        run: docker build --target websh_server_runtime -t ${{ env.registory }}:server-${{ env.image-tag }} .
+        run: docker build --target websh_server_runtime -t ${{ env.registory }}:server-latest .
 
       - name: Build image (remover runtime)
-        run: docker build --target websh_remover_runtime -t ${{ env.registory }}:remover-${{ env.image-tag }} .
+        run: docker build --target websh_remover_runtime -t ${{ env.registory }}:remover-latest .
 
       - name: Login docker
         run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
 
+      - name: Set tag
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF:10}
+
       - name: Push image to registory
         run: |
-          docker push ${{ env.registory }}:server-${{ env.image-tag }}
-          docker push ${{ env.registory }}:remover-${{ env.image-tag }}
+          docker push ${{ env.registory }}:server-latest
+          docker tag ${{ env.registory }}:server-latest ${{ env.registory }}:server-${{ steps.vars.outputs.tag }}
+          docker push ${{ env.registory }}:server-${{ steps.vars.outputs.tag }}
+
+          docker push ${{ env.registory }}:remover-latest
+          docker tag ${{ env.registory }}:remover-latest ${{ env.registory }}:remover-${{ steps.vars.outputs.tag }}
+          docker push ${{ env.registory }}:remover-${{ steps.vars.outputs.tag }}
         if: startsWith(github.ref, 'refs/tags/')
 
       - name: Create artifact
