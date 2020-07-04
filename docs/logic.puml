@@ -5,28 +5,17 @@ participant Browser as browser
 participant Nginx as nginx
 participant HTMLFile as html
 participant APIServer as api
-participant Supervisor as visor
-participant Container as cont
-participant Remover as rm
-participant LockFile as lock
+participant ShellgeiBot as cont
 participant Images as img
 participant RemoveFlagFile as rmflag
+participant Remover as rm
 
-activate visor
-
-visor -> rm : 起動
+activate html
+activate api
 activate rm
 
-visor -> cont : 起動
-activate cont
-
-visor -> api : 起動
-activate api
-
-visor -> nginx : 起動
-activate nginx
-
 user -> browser : 画面表示
+activate user
 browser -> nginx : GET index.html
 nginx -> html : GET
 nginx -> browser : レスポンス
@@ -35,35 +24,27 @@ browser -> user : 画面表示
 user -> browser : シェル実行
 browser -> nginx : POST /api/shellgei
 nginx -> api : POSTのプロキシ
-api -> lock : コンテナ使用中のロックファイルを生成
-activate lock
 api -> cont : シェルの実行
+activate cont
 cont -> img : 画像ファイルを生成
 activate img
 cont -> api : 実行結果の返却
+api -> cont : コンテナ破棄
+deactivate cont
 api -> rmflag : コンテナ削除フラグを作成
 activate rmflag
 api -> nginx : レスポンス
 nginx -> browser : レスポンス
 browser -> browser : 画面再描画
 browser -> user : 画面表示
+deactivate user
 
 rm -> rmflag : フラグファイルの有無をチェック
 alt フラグファイルが存在するなら
-    rm -> cont : コンテナ破棄
-    deactivate cont
     rm -> img : 画像ファイルを削除
     deactivate img
     rm -> rmflag : 削除フラグ削除
     deactivate rmflag
-    rm -> lock : ロックファイル削除
-    deactivate lock
-end
-
-visor -> cont : プロセス死活監視
-alt コンテナプロセスが死んでいたら
-    visor -> cont : コンテナ起動
-    activate cont
 end
 
 @enduml
