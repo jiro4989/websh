@@ -140,7 +140,6 @@ nginx                   ローカル開発用のnginxの設定
 websh_front             フロントエンドのプログラム
 websh_server            バックエンドのAPIサーバのプログラム
 websh_remover           バックエンドの後始末を行うプログラム
-config.nims             タスク定義
 Dockerfile              アプリのDockerイメージ
 docker-compose.yml      ローカル開発でのみ使用する開発環境設定
 =====================   ========================================
@@ -171,7 +170,6 @@ http://localhost
 Branch name        Description
 ================   =============================================================================
 master             本番用
-develop            たまに使うが基本放置
 feature/#xx-desc   新機能、UI改善
 hotfix/#xx-desc    バグ修正
 chore/#xx-desc     CIやローカル開発環境の整備など、アプリに影響しない雑多なもの
