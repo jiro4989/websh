@@ -134,30 +134,25 @@ APIサーバはコンテナの破棄のトリガーを生成するのみに留�
 Path                    Description
 =====================   ========================================
 docs                    READMEの画像ファイルなど
-proxy                   ローカル開発用のnginxの設定
-websh_front             フロントエンドのソースコード
-websh_server            バックエンドのソースコード
+nginx                   ローカル開発用のnginxの設定
+websh_front             フロントエンドのプログラム
+websh_server            バックエンドのAPIサーバのプログラム
+websh_remover           バックエンドの後始末を行うプログラム
 config.nims             タスク定義
-Dockerfile              ローカル開発でのみ使用する
+Dockerfile              アプリのDockerイメージ
 docker-compose.yml      ローカル開発でのみ使用する開発環境設定
-docker-compose-ci.yml   GitHub Actionsでのみ使用する
 =====================   ========================================
 
 
 開発環境の起動方法
 ------------------
 
-リポジトリのルート直下の `config.nims` にリポジトリ内で使用するタスクを定義して
-いる。
 以下のコマンドをリポジトリディレクトリ配下で実行する。
 
 .. code-block:: shell
 
-   # 最初の一度、あるいはDockerイメージを更新したいときだけ実行
-   nim --hints:off pullShellgeiBotImage
-
-   # 開発環境の起動
-   nim --hints:off run
+   docker-compose build
+   docker-compose up
 
 サーバを起動して待機状態になったら、ブラウザで以下のページにアクセスする。
 
