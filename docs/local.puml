@@ -1,16 +1,24 @@
 @startuml
 
-Actor Developer as dev
-node "PC" {
-    frame "Docker" {
-        [nginx]
-        [shellgeibot]
+actor Developer as dev
+
+node PC {
+  frame Docker {
+    [nginx] as nginx
+    frame Application {
+      [websh_server] as server
+      [websh_remover] as remover
     }
-    [websh_server]
+    [shellgeibot] as bot
+  }
+  [file_system] as fs
 }
 
-dev -down-> [nginx] : POST http://localhost/api/shellgei
-[nginx] -down-> [websh_server] : Proxy to http://127.0.1.1:5000/shellgei
-[websh_server] -down-> [shellgeibot] : docker run
+dev -down-> nginx : POST http://localhost/api/shellgei
+nginx -> server : proxy
+server -> bot : POST
+server -down-> fs : write file
+bot -> fs : write file
+remover -> fs : remove file
 
 @enduml

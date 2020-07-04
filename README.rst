@@ -83,15 +83,17 @@ nginxはコンテナ内からホストPCのwebsh_serverにリバースプロキ�
 本番環境
 ---------
 
-Infrastructure as Codeしている。
+Infrastructure as Code (Ansible) している。
 ソースコードは infra_ リポジトリ（非公開）で管理。
-以下はアプリレベルでの構成図。
+
+監視系はローカルPCのDockerコンテナ上で動作するGrafanaとPrometheusで実施。
+`nimbot <https://github.com/jiro4989/nimbot/>`_ はSlack用のBotで、
+websh用のサーバに後乗せで一緒に稼働している。
+
+ログは一旦ローカルに書き出したファイルをFluentdが拾ってJSON形式に変換して保存。
+GrafanaLokiがログを拾って、Grafanaからログを取得してログ監視をしている。
 
 |image-system|
-
-URLレベルでのアクセスフローは以下。
-
-|access-flow|
 
 基本設計
 ================
@@ -138,7 +140,6 @@ nginx                   ローカル開発用のnginxの設定
 websh_front             フロントエンドのプログラム
 websh_server            バックエンドのAPIサーバのプログラム
 websh_remover           バックエンドの後始末を行うプログラム
-config.nims             タスク定義
 Dockerfile              アプリのDockerイメージ
 docker-compose.yml      ローカル開発でのみ使用する開発環境設定
 =====================   ========================================
@@ -169,7 +170,6 @@ http://localhost
 Branch name        Description
 ================   =============================================================================
 master             本番用
-develop            たまに使うが基本放置
 feature/#xx-desc   新機能、UI改善
 hotfix/#xx-desc    バグ修正
 chore/#xx-desc     CIやローカル開発環境の整備など、アプリに影響しない雑多なもの
@@ -255,7 +255,7 @@ Apache License
 .. |image-top| image:: ./docs/top.png
 .. |image-local| image:: ./docs/local.svg
    :alt: ローカル環境の構成図
-.. |image-system| image:: ./docs/system.svg
+.. |image-system| image:: ./docs/system.png
    :alt: システム構成図
 .. |image-proc-flow| image:: ./docs/logic.svg
    :alt: データ処理フロー
@@ -263,8 +263,6 @@ Apache License
    :alt: CIフロー
 .. |image-release-flow| image:: ./docs/release_flow.svg
    :alt: リリースフロー
-.. |access-flow| image:: ./docs/access_flow.svg
-   :alt: アクセスフロー
 
 .. _Nim: https://nim-lang.org/
 .. _Karax: https://github.com/pragmagic/karax
