@@ -154,6 +154,20 @@ docker-compose.yml      ローカル開発でのみ使用する開発環境設�
 開発環境の起動方法
 ------------------
 
+DockerをAPIで操作できるようにする必要がある。
+Linux環境ではSystemdでDockerを起動しているはず。
+docker.serviceを以下のように修正する。
+
+``/lib/systemd/system/docker.service``
+
+.. code-block:: ini
+
+   # ここを
+   ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+
+   # こう修正
+   ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2376 -H fd:// --containerd=/run/containerd/containerd.sock
+
 以下のコマンドをリポジトリディレクトリ配下で実行する。
 
 .. code-block:: shell
