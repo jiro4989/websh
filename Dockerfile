@@ -23,10 +23,6 @@ WORKDIR /work
 # builder stages
 ################################################################################
 
-FROM base AS websh_front_builder
-COPY websh_front/ /work
-RUN nimble build -Y
-
 FROM base AS websh_server_builder
 COPY websh_server/ /work
 RUN nimble build -Y -d:release
