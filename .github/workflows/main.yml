@@ -38,8 +38,8 @@ jobs:
       - name: Build image (base)
         run: docker build --target base -t base .
 
-      - name: Build (front)
-        run: docker build --target websh_front_builder .
+      - name: Build javascript
+        run: docker run --rm -v $PWD/websh_front:/work -t base nimble build -Y
 
       - name: Test (server)
         run: docker run --rm -v $PWD/websh_server:/work -t base nimble test -Y
