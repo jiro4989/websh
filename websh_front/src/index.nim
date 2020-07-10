@@ -2,7 +2,7 @@ from strutils import split
 from strformat import `&`
 from unicode import isAlpha, toRunes, runeAt, `==`, `$`
 from uri import encodeUrl
-from sequtils import mapIt, toSeq, filterIt
+from sequtils import mapIt, toSeq, filterIt, delete
 import json except `%*`
 
 import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, jjson, kajax, localstorage]
@@ -85,6 +85,10 @@ proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示
   shellHistory.add($inputShell)
 
   localStorage.setItem("history", shellHistory.mapIt(cstring(it)).toJson)
+
+proc clearShellHistory(ev: Event, n: VNode) =
+  shellHistory.delete(0, shellHistory.len)
+  localStorage.removeItem("history")
 
 proc inputTextareaOnkeydown(ev: Event, n: VNode) =
   let kbEvt = cast[KeyboardEvent](ev)
@@ -210,6 +214,9 @@ proc createDom(): VNode =
               p(class = "title"):
                 text "history"
               tdiv(class = "content"):
+                tdiv(class = "buttons"):
+                  button(class="button is-danger", onclick = clearShellHistory):
+                    text "Clear history"
                 for hist in shellHistory:
                   tdiv:
                     text hist
