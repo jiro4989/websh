@@ -219,7 +219,8 @@ proc createDom(): VNode =
                     text "Clear history"
                 for hist in shellHistory:
                   tdiv:
-                    text hist
+                    textarea(class = "textarea is-success", rows = "2", readonly="readonly"):
+                      text hist
       tdiv(class = "column"):
         tdiv(class = "tile is-ancestor"):
           tdiv(class = "tile is-parent is-vertical"):
