@@ -2,9 +2,10 @@ from strutils import split
 from strformat import `&`
 from unicode import isAlpha, toRunes, runeAt, `==`, `$`
 from uri import encodeUrl
-from sequtils import mapIt, toSeq, filterIt
+from sequtils import mapIt, toSeq, filterIt, delete
+import json except `%*`
 
-import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, jjson, kajax]
+import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, jjson, kajax, localstorage]
 
 type
   ResponseResult = object
@@ -49,6 +50,12 @@ var
   isProgress: bool
     ## シェルの実行中表示を切り替えるためのフラグ
   hashTag = cstring"シェル芸"
+  shellHistory: seq[string]
+
+# localstorageにシェルの履歴が存在するときだけ取得
+if localstorage.hasItem("history"):
+  let hist = localstorage.getItem("history").`$`.parseJson.to(seq[string])
+  shellHistory.add(hist)
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
@@ -72,6 +79,16 @@ proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示
       ],
     data = body.toJson,
     cont = respCb)
+
+  if 20 < shellHistory.len:
+    shellHistory.delete(0)
+  shellHistory.add($inputShell)
+
+  localStorage.setItem("history", shellHistory.mapIt(cstring(it)).toJson)
+
+proc clearShellHistory(ev: Event, n: VNode) =
+  shellHistory.delete(0, shellHistory.len)
+  localStorage.removeItem("history")
 
 proc inputTextareaOnkeydown(ev: Event, n: VNode) =
   let kbEvt = cast[KeyboardEvent](ev)
@@ -193,6 +210,16 @@ proc createDom(): VNode =
                       for elem in @[cstring"シェル芸", cstring"shellgei", cstring"ゆるシェル", cstring"危険シェル芸", ]:
                         option(value = $elem):
                           text $elem
+            article(class = "tile is-child notification"):
+              p(class = "title"):
+                text "history"
+              tdiv(class = "content"):
+                tdiv(class = "buttons"):
+                  button(class="button is-danger", onclick = clearShellHistory):
+                    text "Clear history"
+                for hist in shellHistory:
+                  tdiv:
+                    text hist
       tdiv(class = "column"):
         tdiv(class = "tile is-ancestor"):
           tdiv(class = "tile is-parent is-vertical"):
