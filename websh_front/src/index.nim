@@ -58,6 +58,17 @@ if localstorage.hasItem("history"):
   let hist = localstorage.getItem("history").`$`.parseJson.to(seq[string])
   shellHistory.add(hist)
 
+proc getCode(q: string): cstring =
+  let s = q[1..^1]
+  let kv = s.split("=")
+  let v = kv[1]
+  result = decodeURI(v)
+
+let query = window.location[].search.`$`
+if 1 < query.len:
+  let code = query.getCode
+  inputShell.add(code)
+
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
   outputStatus = resp.status
@@ -181,7 +192,8 @@ proc createDom(): VNode =
                            setFocus = true,
                            onkeydown = inputTextareaOnkeydown,
                            onkeyup = inputTextareaOnkeyup,
-                           )
+                           ):
+                    text inputShell
                 for ii in 0..<inputImages.len:
                   tdiv(class="file has-name is-primary"):
                     label(class="file-label"):
