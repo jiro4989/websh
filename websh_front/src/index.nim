@@ -32,10 +32,12 @@ let
 
 when defined local:
   # ローカル開発用
-  const apiUrl = "http://localhost/api/shellgei"
+  const baseUrl = "http://localhost"
+  const apiUrl = &"{baseUrl}/api/shellgei"
 else:
   # 本番用
-  const apiUrl = "https://websh.jiro4989.com/api/shellgei"
+  const baseUrl = "https://websh.jiro4989.com"
+  const apiUrl = &"{baseUrl}/api/shellgei"
 
 proc newMediaObj(): MediaObj = MediaObj(name: cstring"", data: cstring"")
 
@@ -66,8 +68,7 @@ proc getCode(q: string): cstring =
 
 let query = window.location[].search.`$`
 if 1 < query.len:
-  let code = query.getCode
-  inputShell.add(code)
+  inputShell.add(query.getCode)
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
@@ -223,6 +224,9 @@ proc createDom(): VNode =
                       for elem in @[cstring"シェル芸", cstring"shellgei", cstring"ゆるシェル", cstring"危険シェル芸", ]:
                         option(value = $elem):
                           text $elem
+                tdiv:
+                  a(href = &"{baseUrl}?code={encodeUrl($inputShell, false)}"):
+                    text &"{baseUrl}?code={encodeUrl($inputShell, false)}"
             article(class = "tile is-child notification"):
               p(class = "title"):
                 text "history"
