@@ -1,22 +1,5 @@
-FROM alpine:3.12 AS base
+FROM 1.2.6-alpine AS base
 
-RUN apk add --no-cache \
-    alpine-sdk
-
-ENV PATH /root/.nimble/bin:$PATH
-
-# install nim (#devel) and nim-tools
-RUN mkdir -p /nim && \
-    git clone https://github.com/nim-lang/Nim /nim && \
-    cd /nim && \
-    sh build_all.sh && \
-    ln -s `pwd`/bin/nim /bin/nim && \
-    nim c koch && \
-    ./koch tools && \
-    ln -s `pwd`/bin/nimble /bin/nimble && \
-    ln -s `pwd`/bin/nimsuggest /bin/nimsuggest
-
-RUN mkdir /work
 WORKDIR /work
 
 ################################################################################
