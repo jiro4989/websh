@@ -1,0 +1,115 @@
+name: test
+
+on:
+  push:
+    paths-ignore:
+      - 'LICENSE'
+      - 'README.*'
+      - '*/README.*'
+      - 'docs/*'
+  release:
+    types: [published]
+
+env:
+  registory: 'jiro4989/websh'
+
+jobs:
+  skip:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Skip job"
+
+  before:
+    runs-on: ubuntu-latest
+    if: "! contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - run: echo "no [skip ci]"
+
+  build:
+    runs-on: ubuntu-latest
+    needs: before
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup
+        run: |
+          pushd websh_server
+          echo -e '\nswitch("d", "ci")' > tests/config.nims
+
+      - name: Build image (base)
+        run: docker build --target base -t base .
+
+      - name: Build javascript
+        run: docker run --rm -v $PWD/websh_front:/work -t base nimble build -Y
+
+      - name: Test (server)
+        run: docker run --rm -v $PWD/websh_server:/work -t base nimble test -Y
+
+      - name: Build image (server runtime)
+        run: docker build --target websh_server_runtime -t ${{ env.registory }}:server-latest .
+
+      - name: Build image (remover runtime)
+        run: docker build --target websh_remover_runtime -t ${{ env.registory }}:remover-latest .
+
+      - name: Login docker
+        run: echo "${{ secrets.DOCKER_PASS }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Set tag
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF:10}
+
+      - name: Push image to registory
+        run: |
+          docker push ${{ env.registory }}:server-latest
+          docker tag ${{ env.registory }}:server-latest ${{ env.registory }}:server-${{ steps.vars.outputs.tag }}
+          docker push ${{ env.registory }}:server-${{ steps.vars.outputs.tag }}
+
+          docker push ${{ env.registory }}:remover-latest
+          docker tag ${{ env.registory }}:remover-latest ${{ env.registory }}:remover-${{ steps.vars.outputs.tag }}
+          docker push ${{ env.registory }}:remover-${{ steps.vars.outputs.tag }}
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Create artifact
+        run: |
+          mkdir -p dist/websh
+          cp -r websh_front/public dist/websh
+          git describe --tags --abbrev=0 > dist/websh/tag.txt
+          pushd dist
+          tar czf websh.tar.gz websh
+          popd
+          ls -lah dist/websh.tar.gz
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: application
+          path: dist/websh.tar.gz
+        if: startsWith(github.ref, 'refs/tags/')
+
+  create-tag-draft:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    steps:
+      - uses: release-drafter/release-drafter@v5.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: application
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: application/websh.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy app
+        run: curl -X POST -H "${{ env.HEADER }}" -d '${{ env.BODY }}' ${{ secrets.DEPLOY_URL }}
+        env:
+          HEADER: "Content-Type: application/json"
+          BODY: '{"text": "sushi"}'
