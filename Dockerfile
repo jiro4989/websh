@@ -1,4 +1,4 @@
-FROM nimlang/nim:1.2.6-alpine AS base
+FROM nimlang/nim:1.4.0-alpine AS base
 
 WORKDIR /work
 
