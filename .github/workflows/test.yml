@@ -37,9 +37,6 @@ jobs:
   test-front:
     runs-on: ubuntu-latest
     needs: before
-    strategy:
-      matrix:
-        image:
     steps:
       - uses: actions/checkout@v2
       - name: Setup
@@ -52,9 +49,6 @@ jobs:
   test-server:
     runs-on: ubuntu-latest
     needs: before
-    strategy:
-      matrix:
-        image:
     steps:
       - uses: actions/checkout@v2
       - name: Setup
