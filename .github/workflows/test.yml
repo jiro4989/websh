@@ -29,9 +29,6 @@ jobs:
   test-build-image:
     runs-on: ubuntu-latest
     needs: before
-    strategy:
-      matrix:
-        image:
     steps:
       - uses: actions/checkout@v2
       - name: Build images
