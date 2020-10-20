@@ -57,7 +57,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build assets
-        run: docker run --rm -v $PWD/websh_front:/work -t base nimble build -Y
+        run: |
+          docker build --target base -t base .
+          docker run --rm -v $PWD/websh_front:/work -t base nimble build -Y
 
       - name: Create artifact
         run: |
