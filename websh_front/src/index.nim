@@ -1,7 +1,7 @@
 from strutils import split
 from strformat import `&`
 from unicode import isAlpha, toRunes, runeAt, `==`, `$`
-from uri import encodeUrl
+from uri import encodeUrl, decodeUrl
 from sequtils import mapIt, toSeq, filterIt, delete
 import json except `%*`
 
@@ -64,7 +64,7 @@ proc getCode(q: string): cstring =
   let s = q[1..^1]
   let kv = s.split("=")
   let v = kv[1]
-  result = decodeURI(v)
+  result = decodeUrl(v)
 
 let query = window.location[].search.`$`
 if 1 < query.len:
