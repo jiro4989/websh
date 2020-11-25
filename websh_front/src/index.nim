@@ -18,6 +18,7 @@ type
   ImageObj = object
     image: cstring
     filesize: cint
+    format: cstring
   MediaObj = object
     name, data: cstring
 
@@ -248,7 +249,11 @@ proc createDom(): VNode =
                 for img in outputImages:
                   tdiv:
                     # imgでbase64を表示するときに必要なメタ情報を追加
-                    img(src = "data:image/png;base64," & img.image)
+                    case $img.format
+                    of "gif":
+                      img(src = "data:image/gif;base64," & img.image)
+                    else:
+                      img(src = "data:image/png;base64," & img.image)
                   tdiv:
                     text &"{img.filesize} byte"
 

@@ -14,6 +14,7 @@ type
   ImageObj* = object
     image*: string
     filesize*: int
+    format*: string
 
 const
   scriptName = "exec.sh"
@@ -29,7 +30,13 @@ proc getImages(dir: string): seq[ImageObj] =
     if not path.existsFile:
       continue
     let content = readFile(path)
-    let img = ImageObj(image: base64.encode(content), filesize: content.len)
+    var format = "png"
+    if 6 < content.len:
+      let f = content[0..<6]
+      case f
+      of "GIF89a": format = "gif"
+      else: discard
+    let img = ImageObj(image: base64.encode(content), filesize: content.len, format: format)
     result.add(img)
 
 proc createMediaFiles(dir: string, medias: seq[string]) =
