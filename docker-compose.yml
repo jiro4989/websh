@@ -22,6 +22,8 @@ services:
       - build
       - -Y
       - -d:local
+      - -d:tag:tag
+      - -d:revision:rev
 
   websh_server:
     build: *app-build

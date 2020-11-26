@@ -39,6 +39,10 @@ else:
   const baseUrl = "https://websh.jiro4989.com"
   const apiUrl = &"{baseUrl}/api/shellgei"
 
+# コンパイル時に値を埋め込む
+const tag {.strdefine.} = "v0.0.0"
+const revision {.strdefine.} = "develop"
+
 proc newMediaObj(): MediaObj = MediaObj(name: cstring"", data: cstring"")
 
 var
@@ -282,6 +286,8 @@ proc createDom(): VNode =
           a(href = "https://github.com/jiro4989/websh"): text "Repository"
           text ", "
           a(href = "https://stats.uptimerobot.com/EZnRXc325K"): text "Public Status Page"
+        tdiv(class = "content has-text-centered"):
+          text "tag: " & tag & ", revision: " & revision
 
 when not defined modeTest:
   setRenderer createDom

@@ -59,7 +59,10 @@ jobs:
       - name: Build assets
         run: |
           docker build --target base -t base .
-          docker run --rm -v $PWD/websh_front:/work -t base nimble build -Y
+          docker run --rm -v $PWD/websh_front:/work -t base \
+            nimble build -Y \
+                         "-d:tag:${GITHUB_REF/refs?heads?}" \
+                         "-d:revision:$GITHUB_SHA"
 
       - name: Create artifact
         run: |
