@@ -11,9 +11,9 @@ when isMainModule and not defined modeTest:
   while true:
     # containerDir = tmp/containerName
     for containerDir in walkDirs(tmpDir/"*"):
-      if not existsDir(containerDir): continue
+      if not dirExists(containerDir): continue
       let rmflagDir = containerDir/"removes"
-      if not existsDir(rmflagDir): continue
+      if not dirExists(rmflagDir): continue
 
       removeDir(containerDir)
       echo %*{"time": $now(), "level": "info", "msg": &"{containerDir} was removed"}

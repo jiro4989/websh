@@ -1,6 +1,5 @@
-import asyncdispatch, os, osproc, strutils, json, base64, times, streams, sequtils
+import asyncdispatch, os, strutils, json, base64, times
 from strformat import `&`
-from algorithm import sorted
 
 # 外部ライブラリ
 import jester, uuids
@@ -27,7 +26,7 @@ proc getImages(dir: string): seq[ImageObj] =
   ## 画像ディレクトリから画像ファイルを取得。
   ## 取得の際はBase64エンコードした文字列として取得する。
   for path in walkFiles(dir / "*"):
-    if not path.existsFile:
+    if not path.fileExists:
       continue
     let content = readFile(path)
     var format = "png"

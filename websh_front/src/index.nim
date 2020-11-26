@@ -5,7 +5,7 @@ from uri import encodeUrl, decodeUrl
 from sequtils import mapIt, toSeq, filterIt, delete
 import json except `%*`
 
-import karax / [kbase, vdom, kdom, vstyles, karax, karaxdsl, jdict, jstrutils, jjson, kajax, localstorage]
+import karax / [vdom, kdom, karax, karaxdsl, jstrutils, jjson, kajax, localstorage]
 
 type
   ResponseResult = object
