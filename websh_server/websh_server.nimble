@@ -12,5 +12,5 @@ binDir        = "bin"
 # Dependencies
 
 requires "nim >= 1.4.0"
-requires "jester#7e8df6543a57c3ef31d1e5ae33f88a707486ec11"
+requires "jester >= 0.5.0"
 requires "uuids >= 0.1.10"
