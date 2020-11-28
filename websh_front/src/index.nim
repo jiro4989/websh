@@ -146,6 +146,13 @@ proc deleteFileButtonOnClicked(i: int): proc(ev: Event, n: VNode) =
     inputImages[i].name = cstring""
     inputImages[i].data = cstring""
 
+proc croppedUrl(): string =
+  ## limit 以上の文字数になったURLを切り詰めて ... を付与する。
+  const limit = 80
+  result = &"{baseUrl}?code={encodeUrl($inputShell, false)}"
+  if limit < result.len:
+    result = result[0..<limit] & "..."
+
 proc createDom(): VNode =
   result = buildHtml(tdiv):
 
@@ -230,7 +237,7 @@ proc createDom(): VNode =
                           text $elem
                 tdiv:
                   a(href = &"{baseUrl}?code={encodeUrl($inputShell, false)}"):
-                    text &"{baseUrl}?code={encodeUrl($inputShell, false)}"
+                    text croppedUrl()
             article(class = "tile is-child notification"):
               p(class = "title"):
                 text "history"
