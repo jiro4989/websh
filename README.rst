@@ -10,7 +10,7 @@ websh - Web shellgei execution environment
    <p align="center">
      <a href="https://github.com/jiro4989/websh/releases/latest"><img src="https://img.shields.io/github/release/jiro4989/websh.svg" alt="Latest version" /></a>
      <a href="https://github.com/jiro4989/websh/actions"><img src="https://github.com/jiro4989/websh/workflows/test/badge.svg" alt="Build Status" /></a>
-     <a href="LICENSE" alt="MIT License"><img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat" /></a>
+     <a href="LICENSE" alt="MIT/Apache-2.0 License"><img src="https://img.shields.io/badge/licence-MIT%2FApache--2.0-blue?style=flat" /></a>
    </p>
 
 | websh はWebブラウザ上でシェル芸botの実行環境を提供するWebアプリです。
