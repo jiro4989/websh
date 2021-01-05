@@ -3,7 +3,7 @@
 version       = "0.1.0"
 author        = "jiro4989"
 description   = "A new awesome nimble package"
-license       = "MIT"
+license       = "Apache-2.0 License"
 srcDir        = "src"
 bin           = @["websh_server"]
 binDir        = "bin"
