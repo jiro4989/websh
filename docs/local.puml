@@ -3,7 +3,7 @@
 actor Developer as dev
 
 node PC {
-  frame Docker {
+  package Docker {
     [nginx] as nginx
     frame Application {
       [websh_server] as server
@@ -15,9 +15,9 @@ node PC {
 }
 
 dev -down-> nginx : POST http://localhost/api/shellgei
-nginx -> server : proxy
-server -> bot : POST
-server -down-> fs : write file
+nginx -down-> server : proxy
+server -left-> bot : POST
+server -down-> fs : read / write file
 bot -> fs : write file
 remover -> fs : remove file
 
