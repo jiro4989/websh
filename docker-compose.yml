@@ -8,7 +8,6 @@ services:
       - "./websh_front/public:/var/www:ro"
     ports:
       - "80:80"
-    network_mode: "host"
 
   websh_front:
     build: &app-build
@@ -27,14 +26,14 @@ services:
 
   websh_server:
     build: *app-build
+    container_name: websh_server
     volumes:
       - "./websh_server:/work"
     environment:
       HOST_PWD: "$PWD/websh_server"
     entrypoint: ./entrypoint.sh
-    ports:
-      - "5000:5000"
-    network_mode: "host"
+    expose:
+      - 5000
 
   websh_remover:
     build: *app-build
