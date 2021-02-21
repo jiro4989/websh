@@ -19,6 +19,8 @@ const
   scriptName = "exec.sh"
   targetScript = "/tmp/" & scriptName
   containerPrefix = "shellgeibot"
+  # #158 JSONのキーにハイフンを含めるべきでないのでlowerCamelCaseにする
+  xForHeader = "xForwardedFor"
 
 proc getTmpDir(): string = getCurrentDir() / "tmp"
 
@@ -48,99 +50,103 @@ proc createMediaFiles(dir: string, medias: seq[string]) =
     let file = dir / $i
     writeFile(file, data)
 
+template runShellgei(code: string, base64Images: seq[string]) =
+  let
+    startTime = now()
+    uuid = $genUUID()
+    xFor = request.headers().getOrDefault("X-Forwarded-for")
+  try:
+    # 一連の処理開始のログ
+    echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": code, "msg": "request begin"}
+
+    let
+      contDir = getTmpDir() / uuid
+      scriptDir = contDir / "script"
+      imageDir = contDir / "images"
+      mediaDir = contDir / "media"
+      removeFlag = contDir / "removes"
+      hostContDir = getEnv("HOST_PWD") / "tmp" / uuid
+      hostScriptDir = hostContDir / "script"
+      hostImageDir = hostContDir / "images"
+      hostMediaDir = hostContDir / "media"
+
+    createDir(imageDir)
+
+    # コンテナ内で実行するスクリプトの生成
+    createDir(scriptDir)
+    let shellScriptPath = scriptDir/scriptName
+    writeFile(shellScriptPath, code)
+    let hostShellScriptPath = hostScriptDir/scriptName
+
+    # Mediaの配置
+    createMediaFiles(mediaDir, base64Images)
+
+    # コンテナ上でシェルを実行
+    const image = "theoldmoon0602/shellgeibot"
+    let cmds = @[
+      "bash",
+      "-c",
+      &"sync && cp {targetScript} {targetScript}.1 && chmod +x {targetScript}.1 && {targetScript}.1 | stdbuf -o0 head -c 100K",
+      ]
+    var client = newClient()
+    let (stdoutStr, stderrStr, status, systemMsg) =
+      client.runContainer(
+        name = uuid,
+        image = image,
+        cmds = cmds,
+        script = hostShellScriptPath,
+        mediaDir = hostMediaDir,
+        imageDir = hostImageDir)
+
+    # TODO: ここ邪魔だなぁ
+    case status
+    of statusOk: discard
+    of statusTimeout:
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
+    else:
+      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
+
+    let images = getImages(imageDir)
+
+    # 削除フラグをたてる
+    createDir(removeFlag)
+
+    let elapsedTime = (now() - startTime).inMilliseconds
+    echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "request end"}
+
+    resp %*{
+      "status": status,
+      "system_message": systemMsg,
+      "stdout": stdoutStr,
+      "stderr": stderrStr,
+      "images": images,
+      "elapsed_time": $elapsedTime & "milsec",
+    }
+  except:
+    let msg = getCurrentExceptionMsg()
+    let elapsedTime = $(now() - startTime).inMilliseconds & "milsec"
+    echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
+
+    resp %*{
+      "status": statusSystemError,
+      "system_message": "System error occured.",
+      "stdout": "",
+      "stderr": "",
+      "images": [],
+      "elapsed_time": elapsedTime,
+    }
+
 router myrouter:
   post "/shellgei":
-    const
-      # #158 JSONのキーにハイフンを含めるべきでないのでlowerCamelCaseにする
-      xForHeader = "xForwardedFor"
-    let
-      now = now()
-      uuid = $genUUID()
-      xFor = request.headers().getOrDefault("X-Forwarded-for")
-    try:
-      var respJson = request.body().parseJson().to(ReqShellgeiJSON)
+    let req = request.body().parseJson().to(ReqShellgeiJSON)
+    runShellgei(req.code, req.images)
 
-      # 一連の処理開始のログ
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "request begin"}
-
-      let
-        contDir = getTmpDir() / uuid
-        scriptDir = contDir / "script"
-        imageDir = contDir / "images"
-        mediaDir = contDir / "media"
-        removeFlag = contDir / "removes"
-        hostContDir = getEnv("HOST_PWD") / "tmp" / uuid
-        hostScriptDir = hostContDir / "script"
-        hostImageDir = hostContDir / "images"
-        hostMediaDir = hostContDir / "media"
-
-      createDir(imageDir)
-
-      # コンテナ内で実行するスクリプトの生成
-      createDir(scriptDir)
-      let shellScriptPath = scriptDir/scriptName
-      writeFile(shellScriptPath, respJson.code)
-      let hostShellScriptPath = hostScriptDir/scriptName
-
-      # Mediaの配置
-      createMediaFiles(mediaDir, respJson.images)
-
-      # コンテナ上でシェルを実行
-      const image = "theoldmoon0602/shellgeibot"
-      let cmds = @[
-        "bash",
-        "-c",
-        &"sync && cp {targetScript} {targetScript}.1 && chmod +x {targetScript}.1 && {targetScript}.1 | stdbuf -o0 head -c 100K",
-        ]
-      var client = newClient()
-      let (stdoutStr, stderrStr, status, systemMsg) =
-        client.runContainer(
-          name = uuid,
-          image = image,
-          cmds = cmds,
-          script = hostShellScriptPath,
-          mediaDir = hostMediaDir,
-          imageDir = hostImageDir)
-
-      # TODO: ここ邪魔だなぁ
-      case status
-      of statusOk: discard
-      of statusTimeout:
-        echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
-      else:
-        echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
-
-      let images = getImages(imageDir)
-
-      # 削除フラグをたてる
-      createDir(removeFlag)
-
-      let elapsedTime = (now() - now).inMilliseconds
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "request end"}
-
-      resp %*{
-        "status": status,
-        "system_message": systemMsg,
-        "stdout": stdoutStr,
-        "stderr": stderrStr,
-        "images": images,
-        "elapsed_time": $elapsedTime & "milsec",
-      }
-    except:
-      let msg = getCurrentExceptionMsg()
-      let elapsedTime = $(now() - now).inMilliseconds & "milsec"
-      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
-
-      resp %*{
-        "status": statusSystemError,
-        "system_message": "System error occured.",
-        "stdout": "",
-        "stderr": "",
-        "images": [],
-        "elapsed_time": elapsedTime,
-      }
   get "/ping":
     resp %*{"status":"ok"}
+
+  get "/ping/shellgei":
+    let emptyImages: seq[string] = @[]
+    runShellgei("echo hello shellgeibot", emptyImages)
 
 proc main =
   echo %*{"time": $now(), "level": "info", "msg": "server begin", "nimVersion": NimVersion}
