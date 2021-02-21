@@ -1,4 +1,4 @@
-import asyncdispatch, os, strutils, json, base64, times
+import asyncdispatch, os, strutils, json, base64, times, streams, osproc
 from strformat import `&`
 
 # 外部ライブラリ
@@ -49,6 +49,47 @@ proc createMediaFiles(dir: string, medias: seq[string]) =
     let data = base64.decode(encodedImage)
     let file = dir / $i
     writeFile(file, data)
+
+proc readStream(strm: var Stream): string =
+  defer: strm.close()
+  result = strm.readAll()
+
+proc runCommand(command: string, args: openArray[string], timeout: int = 3): (string, string, int, string) =
+  ## ``command`` を実行し、標準出力と標準エラー出力を返す。
+  ## timeout は秒を指定する。
+  var
+    p = startProcess(command, args = args, options = {poUsePath})
+    stdoutStr, stderrStr: string
+  defer: p.close()
+
+  let
+    timeoutMilSec = timeout * 1000
+    exitCode = waitForExit(p, timeout = timeoutMilSec)
+
+  # 処理結果の判定
+  var
+    status: int
+    msg: string
+  if exitCode == 0:
+    status = statusOk
+  elif exitCode == 137:
+    status = statusTimeout
+    msg = &"timeout: {timeout} second"
+    info &"exitCode={exitCode}, msg={msg}"
+  else:
+    status = statusSystemError
+    msg = &"failed to run command: command={command}, args={args}"
+    error &"exitCode={exitCode}, msg={msg}"
+
+  # 出力の取得
+  block:
+    var strm = p.outputStream
+    stdoutStr = strm.readStream()
+  block:
+    var strm = p.errorStream
+    stderrStr = strm.readStream()
+
+  result = (stdoutStr, stderrStr, status, msg)
 
 template runShellgei(code: string, base64Images: seq[string]) =
   let
@@ -105,6 +146,28 @@ template runShellgei(code: string, base64Images: seq[string]) =
       echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
     else:
       echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
+
+    # コマンドを実行するDockerイメージ名
+    createDir(imageDir)
+    let containerShellScriptPath = &"/tmp/{scriptName}"
+    let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
+    let args = [
+      "run",
+      "--rm",
+      "--net=none",
+      "-m", "256MB",
+      "--oom-kill-disable",
+      "--pids-limit", "1024",
+      "--name", uuid,
+      "-v", &"{shellScriptPath}:{containerShellScriptPath}",
+      "-v", &"{imageDir}:/{img}",
+      # "-v", "./media:/media:ro",
+      imageName,
+      "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
+      ]
+    let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
+    let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
+
 
     let images = getImages(imageDir)
 
