@@ -127,14 +127,15 @@ template runShellgei(code: string, base64Images: seq[string]) =
     let elapsedTime = $(now() - startTime).inMilliseconds & "milsec"
     echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
 
-    resp %*{
+    let data = $(%*{
       "status": statusSystemError,
       "system_message": "System error occured.",
       "stdout": "",
       "stderr": "",
       "images": [],
       "elapsed_time": elapsedTime,
-    }
+    })
+    resp(Http500, data, contentType = "application/json; charset=utf-8")
 
 router myrouter:
   post "/shellgei":
