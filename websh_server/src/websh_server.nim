@@ -75,11 +75,9 @@ proc runCommand(command: string, args: openArray[string], timeout: int = 3): (st
   elif exitCode == 137:
     status = statusTimeout
     msg = &"timeout: {timeout} second"
-    info &"exitCode={exitCode}, msg={msg}"
   else:
     status = statusSystemError
     msg = &"failed to run command: command={command}, args={args}"
-    error &"exitCode={exitCode}, msg={msg}"
 
   # 出力の取得
   block:
@@ -139,18 +137,8 @@ template runShellgei(code: string, base64Images: seq[string]) =
         mediaDir = hostMediaDir,
         imageDir = hostImageDir)
 
-    # TODO: ここ邪魔だなぁ
-    case status
-    of statusOk: discard
-    of statusTimeout:
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
-    else:
-      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
-
     # コマンドを実行するDockerイメージ名
-    createDir(imageDir)
     let containerShellScriptPath = &"/tmp/{scriptName}"
-    let imageName = getEnv("WEBSH_DOCKER_IMAGE", "theoldmoon0602/shellgeibot")
     let args = [
       "run",
       "--rm",
@@ -162,11 +150,19 @@ template runShellgei(code: string, base64Images: seq[string]) =
       "-v", &"{shellScriptPath}:{containerShellScriptPath}",
       "-v", &"{imageDir}:/{img}",
       # "-v", "./media:/media:ro",
-      imageName,
+      image,
       "bash", "-c", &"chmod +x {containerShellScriptPath} && sync && {containerShellScriptPath} | stdbuf -o0 head -c 100K",
       ]
     let timeout = getEnv("WEBSH_REQUEST_TIMEOUT", "3").parseInt
     let (stdoutStr, stderrStr, status, systemMsg) = runCommand("docker", args, timeout)
+
+    # TODO: ここ邪魔だなぁ
+    case status
+    of statusOk: discard
+    of statusTimeout:
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": systemMsg}
+    else:
+      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "code": systemMsg}
 
 
     let images = getImages(imageDir)
