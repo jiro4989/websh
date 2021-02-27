@@ -28,6 +28,7 @@ paths:
       description: |
         シェル芸を実行し、結果を取得する。
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -49,6 +50,7 @@ paths:
 components:
   schemas:
     requestShellgei:
+      type: object
       properties:
         code:
           description: 実行するシェルのコマンド列
@@ -62,6 +64,8 @@ components:
           items:
             type: string
           example: ["iVBORw0KGgoAAAANSUhEUgAAAG4AAAAWC ..."]
+      required:
+        - code
 
     responseStatus:
       properties:
