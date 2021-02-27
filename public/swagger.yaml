@@ -27,6 +27,11 @@ paths:
     post:
       description: |
         シェル芸を実行し、結果を取得する。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestShellgei"
       responses:
         "200":
           description: シェル芸を正常に実行し終えた時のレスポンス
@@ -43,6 +48,21 @@ paths:
 
 components:
   schemas:
+    requestShellgei:
+      properties:
+        code:
+          description: 実行するシェルのコマンド列
+          type: string
+          example: echo 'hello world'
+        images:
+          description: |
+            シェル実行環境に持ち込む画像データ。
+            画像はBase64エンコードされた文字列の配列。
+          type: array
+          items:
+            type: string
+          example: ["iVBORw0KGgoAAAANSUhEUgAAAG4AAAAWC ..."]
+
     status:
       properties:
         status:
