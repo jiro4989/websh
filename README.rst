@@ -49,6 +49,9 @@ API
 `images` にbase64エンコードした画像ファイルを含めるとwebsh上の `/media` 配下にア
 ップロードしたファイルがbase64デコードされて配置されます。
 
+詳細なAPI仕様は https://jiro4989.github.io/websh/swagger.html を参照してください
+。
+
 開発の背景
 ====
 
