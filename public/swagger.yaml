@@ -1,0 +1,88 @@
+openapi: 3.0.2
+
+info:
+  version: "1.0"
+  title: Websh API
+
+servers:
+  - url: "https://websh.jiro4989.com/api"
+    description: 本番環境
+
+paths:
+  /ping:
+    get:
+      description: |
+        サーバの稼働状態を返す。
+      responses:
+        "200":
+          description: サーバが稼働している状態
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/status"
+        "500":
+          description: サーバが死んでる状態
+
+  /shellgei:
+    post:
+      description: |
+        シェル芸を実行し、結果を取得する。
+      responses:
+        "200":
+          description: シェル芸を正常に実行し終えた時のレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/shellgei"
+        "500":
+          description: 何らかの問題が発生してシェル芸を実行できなかった時のレスポンス
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/shellgei"
+
+components:
+  schemas:
+    status:
+      properties:
+        status:
+          description: 稼働状態を返す
+          type: string
+          example: ok
+
+    shellgei:
+      properties:
+        status:
+          description: |
+            処理結果のステータス。
+
+            - 正常に処理された場合は 0
+            - タイムアウトした場合は 1
+            - なんらかのエラーが発生した場合は 100
+          type: integer
+          enum: [0, 1, 100]
+          example: 0
+        system_message:
+          description: エラー発生時のメッセージ
+          type: string
+          example: "System error occured."
+        stdout:
+          description: シェル芸実行結果の標準出力
+          type: string
+          example: "hello world"
+        stderr:
+          description: シェル芸実行結果の標準エラー出力
+          type: string
+          example: "x: command not found"
+        images:
+          description: |
+            シェル芸実行結果の画像ファイルのBase64エンコードされた文字列。
+            画像フォーマットは実行したシェルに依存するため不定。
+          type: array
+          items:
+            type: string
+          example: ["iVBORw0KGgoAAAANSUhEUgAAAG4AAAAWC ..."]
+        elapsed_time:
+          description: シェル芸の実行にかかった時間
+          type: string
+          example: "1000milsec"
