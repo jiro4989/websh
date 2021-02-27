@@ -219,6 +219,25 @@ masterブランチのCIが走るとリリースドラフトが生成されてし
 
 `websh_serverディレクトリ配下のREADME`_ を参照。
 
+API仕様の更新と確認
+----
+
+`public` ディレクトリ配下にWebshのAPI仕様を定義している。
+API仕様が変わった場合は、こちらも合わせて更新する。
+API仕様はOpenAPI 3.0.2を使用している。
+API仕様はGitHub Pagesで閲覧できる。masterブランチが更新されると自動で反映される。
+
+更新したswagger.yamlをローカルで確認する場合は、以下のコマンドを実行してローカル
+でサーバを起動して確認する。
+
+.. code-block:: shell
+
+   $ cd public
+   $ python3 -m http.server
+
+サーバを起動したら http://localhost:8000/swagger.html を開いて画面が期待通り描画
+されるかを確認する。
+
 CI
 ----
 
