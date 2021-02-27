@@ -19,7 +19,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/status"
+                $ref: "#/components/schemas/responseStatus"
         "500":
           description: サーバが死んでる状態
 
@@ -38,13 +38,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/shellgei"
+                $ref: "#/components/schemas/responseShellgei"
         "500":
           description: 何らかの問題が発生してシェル芸を実行できなかった時のレスポンス
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/shellgei"
+                $ref: "#/components/schemas/responseShellgei"
 
 components:
   schemas:
@@ -63,14 +63,14 @@ components:
             type: string
           example: ["iVBORw0KGgoAAAANSUhEUgAAAG4AAAAWC ..."]
 
-    status:
+    responseStatus:
       properties:
         status:
           description: 稼働状態を返す
           type: string
           example: ok
 
-    shellgei:
+    responseShellgei:
       properties:
         status:
           description: |
