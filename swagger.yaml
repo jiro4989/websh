@@ -19,7 +19,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/status"
+                $ref: "#/components/schemas/responseStatus"
         "500":
           description: サーバが死んでる状態
 
@@ -27,30 +27,50 @@ paths:
     post:
       description: |
         シェル芸を実行し、結果を取得する。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/requestShellgei"
       responses:
         "200":
           description: シェル芸を正常に実行し終えた時のレスポンス
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/shellgei"
+                $ref: "#/components/schemas/responseShellgei"
         "500":
           description: 何らかの問題が発生してシェル芸を実行できなかった時のレスポンス
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/shellgei"
+                $ref: "#/components/schemas/responseShellgei"
 
 components:
   schemas:
-    status:
+    requestShellgei:
+      properties:
+        code:
+          description: 実行するシェルのコマンド列
+          type: string
+          example: echo 'hello world'
+        images:
+          description: |
+            シェル実行環境に持ち込む画像データ。
+            画像はBase64エンコードされた文字列の配列。
+          type: array
+          items:
+            type: string
+          example: ["iVBORw0KGgoAAAANSUhEUgAAAG4AAAAWC ..."]
+
+    responseStatus:
       properties:
         status:
           description: 稼働状態を返す
           type: string
           example: ok
 
-    shellgei:
+    responseShellgei:
       properties:
         status:
           description: |
