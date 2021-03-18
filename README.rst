@@ -52,6 +52,19 @@ API
 詳細なAPI仕様は https://jiro4989.github.io/websh/swagger.html を参照してください
 。
 
+コマンドラインツール
+--------------------
+
+3rd partyのコマンドラインツールが存在します。多謝。
+
+* https://github.com/Khronos31/scripts/blob/master/bin/websh
+* https://github.com/eggplants/websh.sh
+* https://github.com/sheepla/websh-cli
+
+一応自前で作ったコマンドラインツールもある。
+
+* https://github.com/jiro4989/websh-go
+
 開発の背景
 ====
 
