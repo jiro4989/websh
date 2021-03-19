@@ -60,6 +60,7 @@ API
 * https://github.com/Khronos31/scripts/blob/master/bin/websh
 * https://github.com/eggplants/websh.sh
 * https://github.com/sheepla/websh-cli
+* https://github.com/yuu528/sgb
 
 一応自前で作ったコマンドラインツールもある。
 
