@@ -225,8 +225,10 @@ proc createDom(): VNode =
                   button(class="button is-primary", onclick = sendShellButtonOnClick):
                     text "Run (Ctrl + Enter)"
                   a(href = &"""https://twitter.com/intent/tweet?hashtags={encodeUrl($hashTag, false)}&text={encodeUrl($inputShell, false)}&ref_src=twsrc%5Etfw""",
-                      class = "button twitter-share-button is-link",
-                      `data-show-count` = "false"):
+                      # #204 Karaxと干渉しているため
+                      # class = "button twitter-share-button is-link",
+                      # `data-show-count` = "false"):
+                      class = "button is-link"):
                     text "Tweet"
                   tdiv(class = "select"):
                     select:
