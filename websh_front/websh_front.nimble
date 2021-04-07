@@ -13,4 +13,4 @@ backend       = "js"
 # Dependencies
 
 requires "nim >= 1.4.0"
-requires "karax >= 1.1.3"
+requires "karax == 1.1.3"
