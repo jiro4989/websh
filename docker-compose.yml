@@ -8,7 +8,10 @@ services:
       - "./websh_front/public:/var/www:ro"
     ports:
       - "80:80"
-    network_mode: "host"
+    # #204
+    # WSL2に移行してから host モードでコンテナを起動するとブラウザからアクセスで
+    # きなかったのでコメントアウト
+    # network_mode: "host"
 
   websh_front:
     build: &app-build
