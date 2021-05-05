@@ -294,7 +294,7 @@ proc createDom(): VNode =
           text "), Apache License, "
           a(href = "https://github.com/jiro4989/websh"): text "Repository"
           text ", "
-          a(href = "https://stats.uptimerobot.com/EZnRXc325K"): text "Public Status Page"
+          a(href = "https://status-websh.site24x7signals.com"): text "Public Status Page"
         tdiv(class = "content has-text-centered"):
           text "tag: " & tag & ", revision: " & revision
 
