@@ -1,23 +1,25 @@
-import logo from './logo.svg';
 import './App.css';
+import { Terminal } from 'xterm';
+import {useEffect} from 'react';
 
 function App() {
+  const term = new Terminal()
+
+  useEffect(() => {
+    const termElem = document.getElementById("terminal")
+    term.open(termElem)
+    term.writeln("Welcome to websh.")
+    term.writeln("This is a web shellgei execution environment.")
+    term.writeln("Type your shellgei.")
+    term.writeln("")
+    term.writeln("")
+    term.writeln("$ echo sushi")
+    term.writeln("sushi")
+  })
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div id="terminal"></div>
     </div>
   );
 }
