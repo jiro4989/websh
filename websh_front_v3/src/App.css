@@ -1,38 +1,40 @@
 .App {
-  text-align: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #202020;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.terminal-area {
+  width: 80vw;
+  height: 100vh;
+  margin: 0 auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+.shellgei-input {
+  width: 100%;
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  /* resize: none; */
+
+  /* 背景色と同じ色にすることでターミナルに同化 */
+  background-color: #202020;
+
+  /* キャレット（カーソル）の色を変更 */
+  caret-color: white;
+
+  /* フォント色を変更 */
   color: white;
+
+  /* フォントを太字に */
+  font-weight: bold;
+
+  /* 枠線を消す */
+  border: none;
+
+  /* フォーカス時の枠線を消す */
+  outline: none;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Chromeでスクロールバーを非表示にする */
+.shellgei-input::-webkit-scrollbar {
+  display: none;
 }
