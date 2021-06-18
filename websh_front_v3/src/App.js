@@ -29,8 +29,16 @@ function App() {
     console.log(histories)
   }
 
+  const promptElem = <div>
+    <span className="prompt color-user">root@websh-web</span>
+    <span className="prompt color-branch">(master)</span>
+    <span className="prompt color-directory">/</span>
+    <span className="prompt color-root">#</span>
+  </div>
+
   const historyElems = histories
     .map((v) => <div key={v.id}>
+      {promptElem}
       <div>
         <textarea className="shellgei-input" defaultValue={v.shellgei} />
       </div>
@@ -49,8 +57,14 @@ function App() {
   return (
     <div className="App">
       <div className="terminal-area">
+        <div className="message-area">
+          Welcome to websh.
+          This is a shellgei execution environment.<br/>
+          Enter your shellgei.
+        </div>
         {historyElems}
         <div>
+          {promptElem}
           <div>
             <textarea
               className="shellgei-input"
