@@ -19,10 +19,10 @@
   background-color: #202020;
 
   /* キャレット（カーソル）の色を変更 */
-  caret-color: white;
+  caret-color: #F4F4F4;
 
   /* フォント色を変更 */
-  color: white;
+  color: #F4F4F4;
 
   /* フォントを太字に */
   font-weight: bold;
@@ -37,4 +37,14 @@
 /* Chromeでスクロールバーを非表示にする */
 .shellgei-input::-webkit-scrollbar {
   display: none;
+}
+
+.stdout {
+  color: #F4F4F4;
+  background-color: #06B1D9;
+}
+
+.stderr {
+  color: #F4F4F4;
+  background-color: #FE3663;
 }

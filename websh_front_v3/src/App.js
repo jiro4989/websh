@@ -11,7 +11,9 @@ function newHistory(shellgei) {
   const id = newUniqueId()
   const history = {
     id: id,
-    shellgei: shellgei
+    shellgei: shellgei,
+    stdout: "hello world",
+    stderr: "no error",
   }
   return history
 }
@@ -29,7 +31,19 @@ function App() {
 
   const historyElems = histories
     .map((v) => <div key={v.id}>
-      <textarea className="shellgei-input" defaultValue={v.shellgei} />
+      <div>
+        <textarea className="shellgei-input" defaultValue={v.shellgei} />
+      </div>
+      <div>
+        <section>
+          <span className="stdout">STDOUT:</span>
+          <textarea className="shellgei-input" defaultValue={v.stdout} />
+        </section>
+        <section>
+          <span className="stderr">STDERR:</span>
+          <textarea className="shellgei-input" defaultValue={v.stderr} />
+        </section>
+      </div>
     </div>)
 
   return (
@@ -37,15 +51,17 @@ function App() {
       <div className="terminal-area">
         {historyElems}
         <div>
-          <textarea
-            className="shellgei-input"
-            onChange={(e) => setShellgei(e.target.value)}
-            autoFocus
-          />
-        </div>
-        <div>
-          <button onClick={(e) => runShellgei(shellgei)}>Run</button>
-          <button>Tweet</button>
+          <div>
+            <textarea
+              className="shellgei-input"
+              onChange={(e) => setShellgei(e.target.value)}
+              autoFocus
+            />
+          </div>
+          <div>
+            <button onClick={(e) => runShellgei(shellgei)}>Run</button>
+            <button>Tweet</button>
+          </div>
         </div>
       </div>
     </div>
