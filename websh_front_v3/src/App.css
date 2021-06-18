@@ -1,0 +1,85 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  background-color: #202020;
+  color: #F4F4F4;
+  font-size: 1.05em;
+}
+
+.terminal-area {
+  width: 80vw;
+  height: 100vh;
+  margin: 0 auto;
+}
+
+.shellgei-input {
+  width: 100%;
+
+  /* resize: none; */
+
+  /* 背景色と同じ色にすることでターミナルに同化 */
+  background-color: #202020;
+
+  /* キャレット（カーソル）の色を変更 */
+  caret-color: #F4F4F4;
+
+  /* フォント色を変更 */
+  color: #F4F4F4;
+
+  /* フォントを太字に */
+  font-weight: bold;
+
+  /* フォントサイズを指定。emはフォントのサイズを基準値1とする */
+  font-size: 1.15em;
+
+  /* 枠線を消す */
+  border: none;
+
+  /* フォーカス時の枠線を消す */
+  outline: none;
+}
+
+/* Chromeでスクロールバーを非表示にする */
+.shellgei-input::-webkit-scrollbar {
+  display: none;
+}
+
+.stdout {
+  color: #F4F4F4;
+  background-color: #06B1D9;
+}
+
+.stderr {
+  color: #F4F4F4;
+  background-color: #FE3663;
+}
+
+/* プロンプト領域 */
+.prompt {
+  /* color: #F4F4F4; */
+  padding: 0 2px;
+}
+
+.color-user {
+  color: red;
+  /* background-color: #ea5550; */
+}
+
+.color-branch {
+  color: green;
+  /* background-color: #7fbfff; */
+}
+
+.color-root {
+  color: grey;
+  /* background-color: #006a6c; */
+}
+
+.color-directory {
+  color: grey;
+  /* background-color: #c70067; */
+}
+
+.message-area {
+  padding-bottom: 2.0em;
+}
