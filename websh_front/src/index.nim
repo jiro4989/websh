@@ -89,8 +89,12 @@ if 1 < query.len:
 
 proc respCb(httpStatus: int, response: cstring) =
   let resp = fromJson[ResponseResult](response)
-  contents.add(Content(typ: ctStdout, text: $resp.stdout))
-  contents.add(Content(typ: ctStderr, text: $resp.stderr))
+  let stdoutStr = $resp.stdout
+  if stdoutStr != "":
+    contents.add(Content(typ: ctStdout, text: stdoutStr))
+  let stderrStr = $resp.stderr
+  if stderrStr != "":
+    contents.add(Content(typ: ctStderr, text: stderrStr))
   # outputStatus = resp.status
   # outputSystemMessage = resp.system_message
   # outputStdout = resp.stdout
