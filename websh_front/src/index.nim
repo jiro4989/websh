@@ -109,10 +109,26 @@ proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示
   if isProgress:
     return
 
+  contents.add(Content(typ: ctHistory, text: $inputShell))
+
+  # webshコマンドが渡された場合は特殊な操作をする
+  block:
+    let sh = inputShell.strip
+    if sh.startsWith("websh "):
+      if sh.startsWith("websh help"):
+        contents.add(Content(typ: ctStdout,
+            text: "websh is websh helper command.\n\nUsage:\n  websh [command]\n\nCommands:\n  help\n  history\n  clear"))
+      elif sh.startsWith("websh history"):
+        for history in shellHistory:
+          contents.add(Content(typ: ctStdout, text: history))
+      elif sh.startsWith("websh clear"):
+        let last = contents.len - 1
+        contents.delete(2..last)
+      return
+
   isProgress = true
   let images = inputImages.filterIt(it.name != cstring"").mapIt(it.data)
   let body = %*{"code": inputShell, "images": images}
-  contents.add(Content(typ: ctHistory, text: $inputShell))
   ajaxPost(apiUrl,
     headers = @[
       (cstring"mode", cstring"cors"),
@@ -198,17 +214,20 @@ proc createDom(): VNode =
                 text "#"
               td:
                 tdiv(class = "content ct-history"):
-                  text content.text
+                  textarea:
+                    text content.text
             of ctStdout:
               td()
               td:
                 tdiv(class = "content ct-stdout"):
-                  text content.text
+                  textarea:
+                    text content.text
             of ctStderr:
               td()
               td:
                 tdiv(class = "content ct-stderr"):
-                  text content.text
+                  textarea:
+                    text content.text
 
         tr:
           td(class = "command-marker"):
