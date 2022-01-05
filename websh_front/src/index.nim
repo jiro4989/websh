@@ -101,6 +101,10 @@ proc respCb(httpStatus: int, response: cstring) =
   isProgress = false
 
 proc sendShellButtonOnClick(ev: Event, n: VNode) = # シェルの実行中表示 ON
+  # 処理中の場合はスキップ
+  if isProgress:
+    return
+
   isProgress = true
   let images = inputImages.filterIt(it.name != cstring"").mapIt(it.data)
   let body = %*{"code": inputShell, "images": images}
