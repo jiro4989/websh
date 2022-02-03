@@ -80,7 +80,6 @@ router myrouter:
         scriptDir = contDir / "script"
         imageDir = contDir / "images"
         mediaDir = contDir / "media"
-        removeFlag = contDir / "removes"
         hostScriptDir = hostContDir / "script"
         hostImageDir = hostContDir / "images"
         hostMediaDir = hostContDir / "media"

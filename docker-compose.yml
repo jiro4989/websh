@@ -1,3 +1,4 @@
+---
 version: '3.7'
 
 services:
@@ -29,21 +30,16 @@ services:
       - -d:revision:rev
 
   websh_server:
-    build: *app-build
+    build:
+      context: websh_server
+      dockerfile: Dockerfile
+      target: runtime
     volumes:
-      - "./websh_server:/work"
+      - ".:/work"
     environment:
       HOST_PWD: "$PWD/websh_server"
+      WEBSH_SHELLGEI_BOT_IMAGE_NAME: "alpine:3"
     entrypoint: ./entrypoint.sh
     ports:
       - "5000:5000"
     network_mode: "host"
-
-  websh_remover:
-    build: *app-build
-    volumes:
-      - "./websh_remover:/work"
-      - "./websh_server/tmp:/dirs"
-    entrypoint: ./entrypoint.sh
-    environment:
-      WEBSH_REMOVER_DIR: "/dirs"
