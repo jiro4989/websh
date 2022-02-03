@@ -39,7 +39,8 @@ proc getImages(dir: string): seq[ImageObj] =
       case f
       of "GIF89a": format = "gif"
       else: discard
-    let img = ImageObj(image: base64.encode(content), filesize: content.len, format: format)
+    let img = ImageObj(image: base64.encode(content), filesize: content.len,
+        format: format)
     result.add(img)
 
 proc createMediaFiles(dir: string, medias: seq[string]) =
@@ -65,7 +66,8 @@ router myrouter:
       var respJson = request.body().parseJson().to(ReqShellgeiJSON)
 
       # 一連の処理開始のログ
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "code": respJson.code, "msg": "request begin"}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid,
+          "code": respJson.code, "msg": "request begin"}
 
       # トップレベルのオブジェクトへのアクセスが発生するため
       {.gcsafe.}:
@@ -97,15 +99,16 @@ router myrouter:
       createMediaFiles(mediaDir, respJson.images)
 
       # コンテナ上でシェルを実行
-      let (stdoutStr, stderrStr, status, systemMsg, logLevel) = runCommandOnContainer(
-        imageName = webshShellgeiBotImageName,
+      let (stdoutStr, stderrStr, status, systemMsg,
+        logLevel) = runCommandOnContainer(imageName = webshShellgeiBotImageName,
         id = uuid,
         hostShellScriptPath = hostShellScriptPath,
         hostImageDir = hostImageDir,
         hostMediaDir = hostMediaDir,
         timeout = webshRequestTimeout,
       )
-      echo %*{xForHeader: xFor, "time": $now(), "level": logLevel, "uuid": uuid, "code": systemMsg}
+      echo %*{xForHeader: xFor, "time": $now(), "level": logLevel, "uuid": uuid,
+          "code": systemMsg}
 
       let images = getImages(imageDir)
 
@@ -113,7 +116,8 @@ router myrouter:
       createDir(removeFlag)
 
       let elapsedTime = (now() - now).inMilliseconds
-      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid, "elapsedTime": elapsedTime, "msg": "request end"}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid,
+          "elapsedTime": elapsedTime, "msg": "request end"}
 
       resp %*{
         "status": status,
@@ -126,7 +130,8 @@ router myrouter:
     except:
       let msg = getCurrentExceptionMsg()
       let elapsedTime = $(now() - now).inMilliseconds & "milsec"
-      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid, "elapsedTime": elapsedTime, "msg": msg}
+      echo %*{xForHeader: xFor, "time": $now(), "level": "error", "uuid": uuid,
+          "elapsedTime": elapsedTime, "msg": msg}
 
       resp %*{
         "status": statusSystemError,
@@ -137,10 +142,11 @@ router myrouter:
         "elapsed_time": elapsedTime,
       }
   get "/ping":
-    resp %*{"status":"ok"}
+    resp %*{"status": "ok"}
 
 proc main =
-  echo %*{"time": $now(), "level": "info", "msg": "server begin", "nimVersion": NimVersion}
+  echo %*{"time": $now(), "level": "info", "msg": "server begin",
+      "nimVersion": NimVersion}
   var port = conf.webshPort.Port
   var settings = newSettings(port = port)
   var jester = initJester(myrouter, settings = settings)

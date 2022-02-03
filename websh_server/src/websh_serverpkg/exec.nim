@@ -8,7 +8,8 @@ proc readStream(strm: var Stream): string =
   defer: strm.close()
   result = strm.readAll()
 
-proc runCommand(command: string, args: openArray[string], timeout: int): (string, string, int, string, string) =
+proc runCommand(command: string, args: openArray[string], timeout: int): (
+    string, string, int, string, string) =
   ## ``command`` を実行し、標準出力と標準エラー出力を返す。
   ## timeout は秒を指定する。
   var
@@ -33,7 +34,8 @@ proc runCommand(command: string, args: openArray[string], timeout: int): (string
 
   result = (stdoutStr, stderrStr, status, msg, logLevel)
 
-proc runCommandOnContainer*(imageName, id, hostShellScriptPath, hostImageDir, hostMediaDir: string, timeout: int): (string, string, int, string, string) =
+proc runCommandOnContainer*(imageName, id, hostShellScriptPath, hostImageDir,
+    hostMediaDir: string, timeout: int): (string, string, int, string, string) =
   const vScript = "/tmp/script.sh"
   let args = [
     "run",

@@ -5,7 +5,8 @@ const
   statusTimeout* = 1
   statusSystemError* = 100
 
-func exitCodeToStatus*(exitCode: int, timeout: int, command: string, args: openArray[string]): (int, string, string) =
+func exitCodeToStatus*(exitCode: int, timeout: int, command: string,
+    args: openArray[string]): (int, string, string) =
   if exitCode == 0:
     (statusOk, "", "info")
   elif exitCode == 137:
