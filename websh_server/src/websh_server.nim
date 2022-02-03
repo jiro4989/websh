@@ -112,9 +112,6 @@ router myrouter:
 
       let images = getImages(imageDir)
 
-      # 削除フラグをたてる
-      createDir(removeFlag)
-
       let elapsedTime = (now() - now).inMilliseconds
       echo %*{xForHeader: xFor, "time": $now(), "level": "info", "uuid": uuid,
           "elapsedTime": elapsedTime, "msg": "request end"}
