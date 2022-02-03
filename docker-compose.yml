@@ -9,10 +9,6 @@ services:
       - "./websh_front/public:/var/www:ro"
     ports:
       - "80:80"
-    # #204
-    # WSL2に移行してから host モードでコンテナを起動するとブラウザからアクセスで
-    # きなかったのでコメントアウト
-    # network_mode: "host"
 
   websh_front:
     build: &app-build
@@ -36,10 +32,9 @@ services:
       target: runtime
     volumes:
       - ".:/work"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       HOST_PWD: "$PWD/websh_server"
-      WEBSH_SHELLGEI_BOT_IMAGE_NAME: "alpine:3"
-    entrypoint: ./entrypoint.sh
+      WEBSH_SHELLGEI_BOT_IMAGE_NAME: "ubuntu:20.04"
     ports:
       - "5000:5000"
-    network_mode: "host"
