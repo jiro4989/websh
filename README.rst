@@ -111,7 +111,18 @@ APIサーバはホストネットワーク上のDockerAPIを使用して、
 画像ファイルなどを配置する一時ディレクトリの後始末は
 APIサーバからは行わず、removerコンテナが非同期に削除する。
 
-|image-local|
+.. code-block:: mermaid
+
+   flowchart TD
+       u[developer] --> n[nginx]
+       subgraph PC
+           n --> s[websh_server]
+           subgraph Application
+               s --> fs[file_system]
+               r[websh_remover] --> fs
+           end
+           sgb[ShellGeiBot] --> fs
+       end
 
 本番環境
 ---------
@@ -319,8 +330,6 @@ Apache License
 .. _`websh_serverディレクトリ配下のREADME`: ./websh_server/README.rst
 
 .. |image-top| image:: ./docs/top.png
-.. |image-local| image:: ./docs/local.svg
-   :alt: ローカル環境の構成図
 .. |image-system| image:: ./docs/system.png
    :alt: システム構成図
 .. |image-proc-flow| image:: ./docs/logic.svg
