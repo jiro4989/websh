@@ -32,7 +32,7 @@ jobs:
           - image-target: websh_remover_runtime
             image-tag-prefix: remover
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build image (server runtime)
         run: docker build --no-cache --target ${{ matrix.image-target }} -t ${{ env.registory }}:${{ matrix.image-tag-prefix }}-latest .
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: before
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Build assets
         run: |
@@ -87,7 +87,7 @@ jobs:
       - build-image
       - build-artifact
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Generate changelog
