@@ -57,6 +57,12 @@ API
 
 3rd partyのコマンドラインツールが存在します。多謝。
 
+Bashライクの操作体系でWebshのAPI経由でシェルを実行するプロンプト。
+
+* https://github.com/sheepla/websh-prompt
+
+コマンドラインでWebshのAPI経由でシェルを実行するCLI。
+
 * https://github.com/Khronos31/scripts/blob/master/bin/websh
 * https://github.com/eggplants/websh.sh
 * https://github.com/sheepla/websh-cli
