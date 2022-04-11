@@ -76,7 +76,7 @@ jobs:
           mv dist/${{ env.release_asset }} .
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ env.release_asset }}
           path: ${{ env.release_asset }}
