@@ -110,7 +110,7 @@ jobs:
           draft: false
           prerelease: false
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: ${{ env.release_asset }}
 
