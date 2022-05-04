@@ -136,7 +136,7 @@ APIサーバからは行わず、removerコンテナが非同期に削除する�
 Infrastructure as Code (Ansible) している。
 ソースコードは infra_ リポジトリ（非公開）で管理。
 
-監視には https://www.netdata.cloud[netdata] を使っている。
+監視には netdata_ を使っている。
 
 以前はサーバ上にGrafanaLokiと各種PrometheusExporterを入れて、ローカルのGrafana＋
 Prometheusコンテナから監視していたけれど、大掛かり過ぎて外した。あとたまに
@@ -333,6 +333,7 @@ Apache License
 .. _infra: https://github.com/jiro4989/infra
 .. _`websh_frontディレクトリ配下のREADME`: ./websh_front/README.rst
 .. _`websh_serverディレクトリ配下のREADME`: ./websh_server/README.rst
+.. _`netdata`: https://www.netdata.cloud
 
 .. |image-top| image:: ./docs/top.png
 .. |image-system| image:: ./docs/system.png
