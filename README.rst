@@ -136,12 +136,11 @@ APIサーバからは行わず、removerコンテナが非同期に削除する�
 Infrastructure as Code (Ansible) している。
 ソースコードは infra_ リポジトリ（非公開）で管理。
 
-監視系はローカルPCのDockerコンテナ上で動作するGrafanaとPrometheusで実施。
-`nimbot <https://github.com/jiro4989/nimbot/>`_ はSlack用のBotで、
-websh用のサーバに後乗せで一緒に稼働している。
+監視には https://www.netdata.cloud[netdata] を使っている。
 
-ログは一旦ローカルに書き出したファイルをFluentdが拾ってJSON形式に変換して保存。
-GrafanaLokiがログを拾って、Grafanaからログを取得してログ監視をしている。
+以前はサーバ上にGrafanaLokiと各種PrometheusExporterを入れて、ローカルのGrafana＋
+Prometheusコンテナから監視していたけれど、大掛かり過ぎて外した。あとたまに
+GrafanaLokiのCPUが張り付いて困っていたのもある。
 
 |image-system|
 
