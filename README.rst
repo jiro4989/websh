@@ -16,7 +16,7 @@ websh - Web shellgei execution environment
 | websh はWebブラウザ上でシェル芸botの実行環境を提供するWebアプリです。
 | シェル芸の実行はDockerコンテナ上で行っており、イメージに `シェル芸botのDockerイメージ`_ を使用しています。
 
-※ 2024/01/20 websh の Web UI を停止しました。現在は静的 HTML を返却する画面だけになっています。
+※ 2024/01/20 websh を停止しました。現在は静的 HTML を返却する画面だけになっています。
 
 * https://websh.jiro4989.com/
 
