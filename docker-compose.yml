@@ -30,6 +30,7 @@ services:
 
   websh_server:
     build: *app-build
+    container_name: websh_server
     volumes:
       - "./websh_server:/work"
     environment:
@@ -37,7 +38,6 @@ services:
     entrypoint: ./entrypoint.sh
     ports:
       - "5000:5000"
-    network_mode: "host"
 
   websh_remover:
     build: *app-build

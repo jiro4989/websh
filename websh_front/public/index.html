@@ -4,17 +4,62 @@
 <head>
   <title>websh</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.0/css/bulma.min.css">
   <link rel="icon" href="/favicon.ico">
   <!--
     #204 Karaxと干渉しているため
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
   -->
   <style>
-  textarea {
+  body {
     font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
     font-size: 14px;
-    line-height: 1.2;
+    color: #C9C9C9;
+    background-color: #202020;
+    height: 100vh;
+  }
+
+  .main-area {
+    width: 60vw;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .content {
+    margin-bottom: 10px;
+    width: 55vw;
+  }
+
+  textarea {
+    font-size: 14px;
+    border: none;
+    background-color: #202020;
+    color: #C9C9C9;
+    caret-color: #C9C9C9;
+    outline: none;
+    width: 100%;
+    resize: none;
+  }
+
+  .command-marker {
+    vertical-align: top;
+  }
+
+  .ct-info {
+    font-weight: bold;
+    color: #efefef;
+  }
+
+  .ct-history {
+    font-weight: bold;
+  }
+
+  .ct-stdout {
+    font-style: italic;
+  }
+
+  .ct-stderr {
+    font-style: italic;
+    color: #B0231D;
   }
   </style>
 
